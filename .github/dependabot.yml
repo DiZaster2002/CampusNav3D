@@ -1,0 +1,15 @@
+version: 2
+updates:
+  # 1. Monitorear las dependencias de Python (Backend)
+  - package-ecosystem: "pip"
+    directory: "/backend" # Buscará archivos requirements.txt o poetry en esta carpeta en la Fase 2
+    schedule:
+      interval: "weekly" # Revisará actualizaciones todos los lunes
+    open-pull-requests-limit: 3
+
+  # 2. Monitorear las automatizaciones de GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 2
