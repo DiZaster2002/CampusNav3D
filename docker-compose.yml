@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgis/postgis:15-3.3-alpine
+    container_name: campusnav3d_postgis
+    environment:
+      POSTGRES_DB: campusnav3d
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: campus_secure_pass_2026
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: campusnav3d_redis
+    ports:
+      - "6379:6379"
+
+volumes:
+  postgres_data:
