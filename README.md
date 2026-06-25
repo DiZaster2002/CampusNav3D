@@ -102,6 +102,52 @@ La IA no constituye la fuente de verdad final del sistema. Los resultados genera
 
 ---
 
+# Instalación y Despliegue Local
+
+Para garantizar la reproducibilidad universal del entorno de investigación, todo el stack tecnológico corre de manera aislada mediante contenedores Docker, incluyendo las dependencias geoespaciales nativas (GDAL, GEOS, PROJ).
+
+## Requisitos previos
+* Docker Desktop (v20.10+ o superior)
+
+* Docker Compose (v2.0+ o superior)
+
+## Pasos para el despliegue
+1.- Clonar el repositorio:
+
+git clone [https://github.com/DiZaster2002/CampusNav3D.git](https://github.com/DiZaster2002/CampusNav3D.git)
+cd CampusNav3D
+
+2.- Configurar el entorno de variables:
+Cree un archivo .env en la raíz del proyecto basándose en la plantilla provista:
+
+cp .env.example .env
+
+3.- Construir y levantar la infraestructura: 
+
+docker-compose up --build
+
+### Puertos de la aplicación expuestos
+Una vez que los contenedores estén en estado activo, se podrá acceder a los diferentes servicios a través de las siguientes direcciones locales:
+
+* 🚀 Backend (GeoDjango API): http://localhost:8000
+
+* 🛢️ Base de Datos (PostGIS): localhost:5432
+
+* ⚡ Broker de Mensajería (Redis): localhost:6379
+
+---
+
+# Ingeniería de Software y Calidad (CI/CD)
+El repositorio incorpora mecanismos automatizados para asegurar el cumplimiento de las directrices de desarrollo ágil y científico:
+
+* Integración Continua (GitHub Actions): Cada Pull Request hacia la rama main activa un pipeline automatizado (lint-and-test) que valida la sintaxis y el estilo del código Python utilizando Flake8 bajo estándares estrictos.
+
+* Auditoría de Seguridad (Dependabot): Escaneo semanal automatizado del árbol de dependencias tanto del ecosistema de paquetes de Python (/backend) como de las dependencias de las propias GitHub Actions, alertando y generando parches automáticos ante vulnerabilidades conocidas.
+
+* Protección de Ramas: La rama principal main se encuentra protegida de forma estricta. Todo código debe ser integrado mediante ramas de funcionalidad cortas (feature/*, bugfix/*, chore/*) validadas previamente por el entorno de CI.
+
+---
+
 # Funcionalidades previstas
 
 ## Gestión espacial
@@ -139,19 +185,19 @@ La IA no constituye la fuente de verdad final del sistema. Los resultados genera
 
 # Objetivos de desarrollo
 
-| Fase | Objetivo                           |
-| ---- | ---------------------------------- |
-| 0    | Auditoría y análisis del prototipo |
-| 1    | Repositorio reproducible           |
-| 2    | Modelo espacial y persistencia     |
-| 3    | Grafo y sistema de rutas           |
-| 4    | Visualización 2D y 3D              |
-| 5    | Integración de proveedores IA      |
-| 6    | Corrección humana y versionado     |
-| 7    | Benchmark experimental             |
-| 8    | Evaluación arquitectónica          |
-| 9    | Documentación y publicación        |
-| 10   | Redacción del artículo científico  |
+| Fase | Objetivo                           | Estado |
+| ---- | ---------------------------------- | ------ |
+| 0    | Auditoría y análisis del prototipo |   ✅   |
+| 1    | Repositorio reproducible           |   ✅   |
+| 2    | Modelo espacial y persistencia     |   ▶️   |
+| 3    | Grafo y sistema de rutas           |   ⏳   |
+| 4    | Visualización 2D y 3D              |   ⏳   |
+| 5    | Integración de proveedores IA      |   ⏳   |
+| 6    | Corrección humana y versionado     |   ⏳   |
+| 7    | Benchmark experimental             |   ⏳   |
+| 8    | Evaluación arquitectónica          |   ⏳   |
+| 9    | Documentación y publicación        |   ⏳   |
+| 10   | Redacción del artículo científico  |   ⏳   |
 
 ---
 
@@ -167,23 +213,27 @@ La IA no constituye la fuente de verdad final del sistema. Los resultados genera
 
 ---
 
-# Estructura prevista del repositorio
+# Estructura del repositorio actual
 
 ```text
 campusnav3d/
+├── .github/
+│   ├── workflows/
+│   │   └── ci.yml             # Pipeline de Integración Continua (Flake8)
+│   └── dependabot.yml         # Configuración de actualizaciones de seguridad
 ├── backend/
-├── frontend/
-├── workers/
-├── docs/
-├── schemas/
-├── examples/
-├── benchmark/
-├── scripts/
-├── README.md
-├── LICENSE
-├── CITATION.cff
-├── docker-compose.yml
-└── .env.example
+│   ├── core/                  # Configuración central del proyecto Django
+│   ├── Dockerfile             # Entorno Linux optimizado con librerías GIS
+│   └── requirements.txt       # Dependencias base del backend
+├── frontend/                  # Código de interfaz (Leaflet, Three.js) [Futuro]
+├── workers/                   # Tareas en segundo plano (Celery) [Futuro]
+├── docs/                      # Documentación técnica y académica
+├── schemas/                   # Esquemas de validación de datos
+├── benchmark/                 # Pruebas de rendimiento reproducibles
+├── docker-compose.yml         # Orquestador global de contenedores
+├── .env.example               # Plantilla de variables de entorno segura
+├── LICENSE                    # Licencia de software abierto
+└── README.md                  # Documentación principal del sistema
 ```
 
 ---
@@ -205,9 +255,10 @@ Las primeras iteraciones estarán centradas en:
 
 # Hoja de ruta inmediata
 
-* [ ] Configurar repositorio GitHub.
-* [ ] Seleccionar licencia de software.
-* [ ] Configurar Docker Compose.
+* [x] Configurar repositorio GitHub y protección de rama principal.
+* [x] Seleccionar licencia de software abierto (Apache 2.0).
+* [x] Configurar entorno reproducible multicon contenedor mediante Docker Compose.
+* [x] Inicializar el backend estructurado en GeoDjango dentro del contenedor.
 * [ ] Definir modelo espacial mínimo.
 * [ ] Diseñar esquema normalizado de extracción.
 * [ ] Implementar `ProceduralExtractor`.
@@ -220,12 +271,7 @@ Las primeras iteraciones estarán centradas en:
 
 # Licencia
 
-Pendiente de definición.
-
-Opciones recomendadas:
-
-* MIT
-* Apache-2.0
+Este proyecto está licenciado bajo la Licencia Apache 2.0, permitiendo su uso, modificación y distribución libre tanto en el ámbito académico como comercial, cumpliendo con los requerimientos de apertura científica de la revista SoftwareX. El archivo de términos legales se encuentra disponible en la raíz como LICENSE.
 
 ---
 
