@@ -19,5 +19,18 @@ services:
     ports:
       - "6379:6379"
 
+  web:
+    build: ./backend
+    container_name: campusnav3d_backend
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgis://postgres:campus_secure_pass_2026@db:5432/campusnav3d
+    depends_on:
+      - db
+
 volumes:
   postgres_data:
