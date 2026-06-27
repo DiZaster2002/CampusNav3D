@@ -1,5 +1,5 @@
 from django.contrib.gis import admin
-from .models import Campus, Building, Floor, Space
+from .models import Campus, Building, Floor, Space, NavigationEdge
 
 @admin.register(Campus)
 class CampusAdmin(admin.GISModelAdmin):
@@ -35,3 +35,10 @@ class SpaceAdmin(admin.GISModelAdmin):
     list_display = ('name', 'space_type', 'floor')
     list_filter = ('space_type', 'floor__building', 'floor')
     search_fields = ('name', 'external_id')
+
+@admin.register(NavigationEdge)
+class NavigationEdgeAdmin(admin.GISModelAdmin):
+    """Panel visual para trazar los caminos del grafo sobre los polígonos."""
+    list_display = ('id', 'name', 'source_space', 'target_space', 'is_accessible')
+    list_filter = ('is_accessible', 'source_space__floor__building')
+    search_fields = ('name',)

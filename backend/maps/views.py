@@ -1,6 +1,6 @@
 from rest_framework import viewsets
-from .models import Campus, Building, Floor, Space
-from .serializers import CampusSerializer, BuildingSerializer, FloorSerializer, SpaceSerializer
+from .models import Campus, Building, Floor, Space, NavigationEdge
+from .serializers import CampusSerializer, BuildingSerializer, FloorSerializer, SpaceSerializer, NavigationEdgeSerializer
 
 class CampusViewSet(viewsets.ModelViewSet):
     queryset = Campus.objects.all()
@@ -17,3 +17,7 @@ class FloorViewSet(viewsets.ModelViewSet):
 class SpaceViewSet(viewsets.ModelViewSet):
     queryset = Space.objects.all()
     serializer_class = SpaceSerializer
+
+class NavigationEdgeViewSet(viewsets.ModelViewSet):
+    queryset = NavigationEdge.objects.all()
+    serializer_class = NavigationEdgeSerializer
