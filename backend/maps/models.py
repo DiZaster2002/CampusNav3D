@@ -68,3 +68,33 @@ class Space(models.Model):
 
     def __str__(self):
         return f"[{self.space_type}] {self.name} ({self.floor.building.code})"
+    
+
+class NavigationEdge(models.Model):
+    """
+    Representa una transición (Edge) en el Grafo Dual de IndoorGML.
+    Conecta físicamente dos celdas de espacio independientes.
+    """
+    name = models.CharField(max_length=100, blank=True, help_text="Nombre opcional de la conexión (ej: Pasillo-Aula101)")
+    source_space = models.ForeignKey(
+        Space, 
+        on_delete=models.CASCADE, 
+        related_name='outgoing_edges',
+        help_text="Espacio de origen (Nodo A)"
+    )
+    target_space = models.ForeignKey(
+        Space, 
+        on_delete=models.CASCADE, 
+        related_name='incoming_edges',
+        help_text="Espacio de destino (Nodo B)"
+    )
+    # Geometría de tipo Línea para pintar el camino exacto de navegación
+    geometry = models.LineStringField(srid=4326)
+    
+    is_accessible = models.BooleanField(
+        default=True, 
+        help_text="Indica si este tramo es apto para personas con movilidad reducida (sin escaleras)"
+    )
+
+    def __str__(self):
+        return f"{self.name or 'Tramo'} ({self.source_space.name} -> {self.target_space.name})"

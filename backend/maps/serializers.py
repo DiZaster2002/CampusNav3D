@@ -1,5 +1,5 @@
 from rest_framework_gis.serializers import GeoFeatureModelSerializer
-from .models import Campus, Building, Floor, Space
+from .models import Campus, Building, Floor, Space, NavigationEdge
 
 class CampusSerializer(GeoFeatureModelSerializer):
     """Serializa objetos Campus al estándar GeoJSON."""
@@ -31,3 +31,10 @@ class SpaceSerializer(GeoFeatureModelSerializer):
         model = Space
         geo_field = 'geometry'
         fields = ('id', 'external_id', 'name', 'space_type', 'floor')
+
+class NavigationEdgeSerializer(GeoFeatureModelSerializer):
+    """Serializa las conexiones del grafo al estándar GeoJSON."""
+    class Meta:
+        model = NavigationEdge
+        geo_field = 'geometry'
+        fields = ('id', 'name', 'source_space', 'target_space', 'is_accessible')
