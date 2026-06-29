@@ -1,0 +1,39 @@
+{
+  "campus": {
+    "name": "Campus Tecnológico Virtual",
+    "geometry": "POLYGON ((-3.702 40.416, -3.704 40.416, -3.704 40.418, -3.702 40.418, -3.702 40.416))"
+  },
+  "building": {
+    "name": "Edificio de Innovación Científica",
+    "code": "EIC",
+    "geometry": "POLYGON ((-3.7025 40.4165, -3.7035 40.4165, -3.7035 40.4175, -3.7025 40.4175, -3.7025 40.4165))"
+  },
+  "floor": {
+    "level": 0,
+    "name": "Planta Baja",
+    "altitude": 0.0,
+    "geometry": "POLYGON ((-3.7025 40.4165, -3.7035 40.4165, -3.7035 40.4175, -3.7025 40.4175, -3.7025 40.4165))"
+  },
+  "spaces": [
+    {
+      "external_id": "SPACE-001",
+      "name": "Laboratorio de Robótica 101",
+      "space_type": "LABORATORY",
+      "geometry": "POLYGON ((-3.7026 40.4166, -3.7029 40.4166, -3.7029 40.4169, -3.7026 40.4169, -3.7026 40.4166))"
+    },
+    {
+      "external_id": "SPACE-002",
+      "name": "Pasillo Principal Norte",
+      "space_type": "CORRIDOR",
+      "geometry": "POLYGON ((-3.7029 40.4166, -3.7034 40.4166, -3.7034 40.4169, -3.7029 40.4169, -3.7029 40.4166))"
+    }
+  ],
+  "edges": [
+    {
+      "name": "Conexión Lab-Pasillo",
+      "source_external_id": "SPACE-001",
+      "target_external_id": "SPACE-002",
+      "geometry": "LINESTRING (-3.70275 40.41675, -3.70315 40.41675)"
+    }
+  ]
+}
