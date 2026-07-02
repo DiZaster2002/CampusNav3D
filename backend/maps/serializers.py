@@ -6,7 +6,7 @@ class CampusSerializer(GeoFeatureModelSerializer):
     class Meta:
         model = Campus
         geo_field = 'geometry'  # Indica cuál es el campo geométrico espacial
-        fields = ('id', 'name', 'slug', 'created_at')
+        fields = ('id', 'external_id', 'name', 'slug', 'created_at')
 
 
 class BuildingSerializer(GeoFeatureModelSerializer):
@@ -14,7 +14,7 @@ class BuildingSerializer(GeoFeatureModelSerializer):
     class Meta:
         model = Building
         geo_field = 'geometry'
-        fields = ('id', 'name', 'code', 'campus')
+        fields = ('id', 'external_id', 'name', 'code', 'campus')
 
 
 class FloorSerializer(GeoFeatureModelSerializer):
@@ -22,7 +22,7 @@ class FloorSerializer(GeoFeatureModelSerializer):
     class Meta:
         model = Floor
         geo_field = 'geometry'
-        fields = ('id', 'level', 'name', 'altitude', 'building')
+        fields = ('id', 'external_id', 'level', 'name', 'altitude', 'building')
 
 
 class SpaceSerializer(GeoFeatureModelSerializer):
