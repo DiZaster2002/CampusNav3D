@@ -7,6 +7,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 from .models import Campus, Space, NavigationEdge
+from .patterns import SpatialEntityFactory, ImportComposite, CampusImportStep, BuildingImportStep, FloorImportStep
 
 class GeoSpatialPipelineTestCase(APITestCase):
     """Suite de pruebas unitarias y de integración avanzada para la capa espacial de CampusNav3D."""
@@ -76,6 +77,36 @@ class GeoSpatialPipelineTestCase(APITestCase):
         aula_magna = Space.objects.get(external_id="TEST-001")
         self.assertEqual(aula_magna.geometry.geom_type, 'Polygon')
         self.assertEqual(len(aula_magna.geometry.coords[0]), 5)
+
+    def test_factory_creates_explicit_entity_handlers(self):
+        """Verifica que el factory expone un mecanismo explícito para crear handlers por tipo de entidad."""
+        factory = SpatialEntityFactory()
+
+        self.assertIsInstance(factory.create_handler('campus'), CampusImportStep)
+        self.assertIsInstance(factory.create_handler('building'), BuildingImportStep)
+        self.assertIsInstance(factory.create_handler('floor'), FloorImportStep)
+
+        with self.assertRaises(ValueError):
+            factory.create_handler('unknown')
+
+    def test_composite_pipeline_executes_children_in_order(self):
+        """Verifica que el composite ejecuta los pasos de importación de forma ordenada."""
+        calls = []
+
+        class RecordingStep:
+            def __init__(self, name):
+                self.name = name
+
+            def process(self, payload, context):
+                calls.append(self.name)
+                context[self.name] = True
+
+        pipeline = ImportComposite()
+        pipeline.add(RecordingStep('campus'))
+        pipeline.add(RecordingStep('building'))
+        pipeline.process({}, {})
+
+        self.assertEqual(calls, ['campus', 'building'])
 
     def test_api_geojson_output_format(self):
         """Verifica que los endpoints REST cumplen estrictamente con la especificación RFC 7946 (GeoJSON)."""
