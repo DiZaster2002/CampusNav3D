@@ -29,6 +29,7 @@ class Command(BaseCommand):
                 campus_data = data['campus']
                 campus, created = Campus.objects.get_or_create(
                     slug=slugify(campus_data['name']),
+                    external_id=campus_data['external_id'],
                     defaults={
                         'name': campus_data['name'],
                         'geometry': GEOSGeometry(campus_data['geometry'])
@@ -40,6 +41,7 @@ class Command(BaseCommand):
                 b_data = data['building']
                 building, created = Building.objects.get_or_create(
                     code=b_data['code'],
+                    external_id=b_data['external_id'],
                     defaults={
                         'name': b_data['name'],
                         'campus': campus,
@@ -53,6 +55,7 @@ class Command(BaseCommand):
                 floor, created = Floor.objects.get_or_create(
                     building=building,
                     level=f_data['level'],
+                    external_id=f_data['external_id'],
                     defaults={
                         'name': f_data['name'],
                         'altitude': f_data['altitude'],

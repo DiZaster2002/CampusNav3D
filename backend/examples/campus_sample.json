@@ -1,17 +1,20 @@
 {
   "campus": {
     "name": "Campus Tecnológico Virtual",
+    "external_id": "CAMPUS-001",
     "geometry": "POLYGON ((-3.702 40.416, -3.704 40.416, -3.704 40.418, -3.702 40.418, -3.702 40.416))"
   },
   "building": {
     "name": "Edificio de Innovación Científica",
     "code": "EIC",
+    "external_id": "BUILDING-001",
     "geometry": "POLYGON ((-3.7025 40.4165, -3.7035 40.4165, -3.7035 40.4175, -3.7025 40.4175, -3.7025 40.4165))"
   },
   "floor": {
     "level": 0,
     "name": "Planta Baja",
     "altitude": 0.0,
+    "external_id": "FLOOR-001",
     "geometry": "POLYGON ((-3.7025 40.4165, -3.7035 40.4165, -3.7035 40.4175, -3.7025 40.4175, -3.7025 40.4165))"
   },
   "spaces": [

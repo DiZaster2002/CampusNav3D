@@ -17,15 +17,18 @@ class GeoSpatialPipelineTestCase(APITestCase):
         self.sample_data = {
             "campus": {
                 "name": "Campus de Pruebas QA",
+                "external_id": "CAMPUS-TEST-001",
                 "geometry": "POLYGON ((-3.702 40.416, -3.704 40.416, -3.704 40.418, -3.702 40.418, -3.702 40.416))"
             },
             "building": {
                 "name": "Edificio Gamma",
+                "external_id": "BUILDING-TEST-001",
                 "code": "ED-GAMMA",
                 "geometry": "POLYGON ((-3.7025 40.4165, -3.7035 40.4165, -3.7035 40.4175, -3.7025 40.4175, -3.7025 40.4165))"
             },
             "floor": {
                 "level": 1,
+                "external_id": "FLOOR-TEST-001",
                 "name": "Primera Planta",
                 "altitude": 3.5,
                 "geometry": "POLYGON ((-3.7025 40.4165, -3.7035 40.4165, -3.7035 40.4175, -3.7025 40.4175, -3.7025 40.4165))"
