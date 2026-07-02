@@ -189,8 +189,8 @@ El repositorio incorpora mecanismos automatizados para asegurar el cumplimiento 
 | ---- | ---------------------------------- | ------ |
 | 0    | Auditoría y análisis del prototipo |   ✅   |
 | 1    | Repositorio reproducible           |   ✅   |
-| 2    | Modelo espacial y persistencia     |   ▶️   |
-| 3    | Grafo y sistema de rutas           |   ⏳   |
+| 2    | Modelo espacial y persistencia     |   ✅   |
+| 3    | Grafo y sistema de rutas           |   ▶️   |
 | 4    | Visualización 2D y 3D              |   ⏳   |
 | 5    | Integración de proveedores IA      |   ⏳   |
 | 6    | Corrección humana y versionado     |   ⏳   |
@@ -259,9 +259,9 @@ Las primeras iteraciones estarán centradas en:
 * [x] Seleccionar licencia de software abierto (Apache 2.0).
 * [x] Configurar entorno reproducible multicon contenedor mediante Docker Compose.
 * [x] Inicializar el backend estructurado en GeoDjango dentro del contenedor.
-* [ ] Definir modelo espacial mínimo.
-* [ ] Diseñar esquema normalizado de extracción.
-* [ ] Implementar `ProceduralExtractor`.
+* [x] Definir modelo espacial mínimo.
+* [x] Diseñar esquema normalizado de extracción.
+* [x] Implementar `ProceduralExtractor`.
 * [ ] Implementar interfaz de proveedor IA.
 * [ ] Implementar `MockAIProvider`.
 * [ ] Crear edificio sintético de demostración.
