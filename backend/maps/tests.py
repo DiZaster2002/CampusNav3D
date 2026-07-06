@@ -174,3 +174,20 @@ class GeoSpatialPipelineTestCase(APITestCase):
         # Si la IA pintara una arista fuera de la habitación, este assert tumbaría el test
         self.assertTrue(intersects_source, "ERROR CRÍTICO: La arista de navegación no intersecta con el espacio de origen.")
         self.assertTrue(intersects_target, "ERROR CRÍTICO: La arista de navegación no intersecta con el espacio de destino.")
+
+
+    def test_factory_ocp_compliance(self):
+        """Prueba que la fábrica puede expandirse en tiempo de ejecución sin modificarse."""
+        from maps.factories import SpatialEntityFactory, BaseCreator
+        
+        # 1. Registrar una entidad ficticia al vuelo
+        @SpatialEntityFactory.register('mock_zone')
+        class MockZoneCreator(BaseCreator):
+            @staticmethod
+            def execute_creation(**kwargs):
+                return "Entidad Extendida Exitosamente", True
+
+        # 2. Invocar la creación sin haber tocado el core de la factoría
+        result, created = SpatialEntityFactory.create('mock_zone')
+        self.assertTrue(created)
+        self.assertEqual(result, "Entidad Extendida Exitosamente")

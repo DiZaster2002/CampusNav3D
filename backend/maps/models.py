@@ -1,6 +1,29 @@
 from django.contrib.gis.db import models
 
-class Campus(models.Model):
+class SpatialComponent:
+    """
+    Componente Base del Patrón Composite (OCP Compliant).
+    Las operaciones del árbol son genéricas y no requieren modificación ante nuevos nodos.
+    """
+    _child_relation = None  # Debe ser sobrescrito por nodos compuestos
+
+    @property
+    def is_leaf(self) -> bool:
+        raise NotImplementedError("Los modelos que hereden de SpatialComponent deben implementar 'is_leaf'")
+
+    def get_children(self):
+        """Navegación genérica del árbol por reflexión de relaciones Django."""
+        if self.is_leaf or not self._child_relation:
+            return []
+        # Obtiene dinámicamente el related manager asignado en el modelo
+        relation = getattr(self, self._child_relation, None)
+        return relation.all() if relation else []
+
+    def get_total_area(self) -> float:
+        """Operación uniforme compartida por toda la jerarquía."""
+        return self.geometry.area
+
+class Campus(models.Model, SpatialComponent):
     """Representa el recinto universitario global."""
     external_id = models.CharField(max_length=100, blank=True, null=True, help_text="ID del campus en planos externos")
     name = models.CharField(max_length=100, unique=True)
@@ -9,6 +32,12 @@ class Campus(models.Model):
     geometry = models.PolygonField(srid=4326, help_text="Delimitación geográfica exterior del campus (WGS84)")
     created_at = models.DateTimeField(auto_now_add=True)
 
+    _child_relation = 'buildings'  # Mapea de forma limpia al related_name
+
+    @property
+    def is_leaf(self) -> bool:
+        return False
+
     def __str__(self):
         return f"Campus: {self.name} - ({self.external_id})"
 
@@ -16,7 +45,7 @@ class Campus(models.Model):
         verbose_name_plural = "Campuses"
 
 
-class Building(models.Model):
+class Building(models.Model, SpatialComponent):
     """Representa un edificio físico dentro de un campus."""
     campus = models.ForeignKey(Campus, on_delete=models.CASCADE, related_name='buildings')
     external_id = models.CharField(max_length=100, blank=True, null=True, help_text="ID del edificio en planos externos")
@@ -25,11 +54,17 @@ class Building(models.Model):
     # Geometría: Polígono del contorno en planta baja del edificio
     geometry = models.PolygonField(srid=4326, help_text="Huella perimetral del edificio (WGS84)")
 
+    _child_relation = 'floors'  # Mapea de forma limpia al related_name
+
+    @property
+    def is_leaf(self) -> bool:
+        return False
+
     def __str__(self):
         return f"{self.name} - ({self.code}) - ({self.external_id})"
 
 
-class Floor(models.Model):
+class Floor(models.Model, SpatialComponent):
     """Representa una planta/piso específico de un edificio."""
     building = models.ForeignKey(Building, on_delete=models.CASCADE, related_name='floors')
     external_id = models.CharField(max_length=100, blank=True, null=True, help_text="ID de la planta en planos externos")
@@ -39,6 +74,12 @@ class Floor(models.Model):
     # Geometría: Huella específica de esta planta (puede diferir de la baja)
     geometry = models.PolygonField(srid=4326, help_text="Contorno geométrico de la planta")
 
+    _child_relation = 'spaces'  # Mapea de forma limpia al related_name
+
+    @property
+    def is_leaf(self) -> bool:
+        return False
+
     class Meta:
         unique_together = ('building', 'level')
         ordering = ['level']
@@ -47,7 +88,7 @@ class Floor(models.Model):
         return f"{self.building.code} - {self.name} - ({self.external_id})"
 
 
-class Space(models.Model):
+class Space(models.Model, SpatialComponent):
     """
     Representación semántica y espacial de un espacio interior utilizable.
     Corresponde conceptualmente al 'CellSpace' del estándar IndoorGML 2.0.
@@ -68,6 +109,10 @@ class Space(models.Model):
     
     # Geometría: Polígono cerrado que representa el área útil interna de la celda
     geometry = models.PolygonField(srid=4326, help_text="Geometría del espacio interior (WGS84)")
+
+    @property
+    def is_leaf(self) -> bool:
+        return True
 
     def __str__(self):
         return f"[{self.space_type}] {self.name} - ({self.floor.building.code}) - ({self.external_id})"
