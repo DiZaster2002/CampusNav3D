@@ -1,4 +1,8 @@
+
+import hashlib
 from django.contrib.gis.db import models
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
 
 class SpatialComponent:
     """
@@ -22,6 +26,76 @@ class SpatialComponent:
     def get_total_area(self) -> float:
         """Operación uniforme compartida por toda la jerarquía."""
         return self.geometry.area
+    
+class SpatialPlanStatus(models.TextChoices):
+    UPLOADED = 'UPLOADED', 'Cargado / Pendiente'
+    PREPROCESSING = 'PREPROCESSING', 'Preprocesando Imagen'
+    EXTRACTING = 'EXTRACTING', 'Extrayendo con IA'
+    REQUIRES_REVIEW = 'REQUIRES_REVIEW', 'Requiere Revisión Manual'
+    PROCESSED = 'PROCESSED', 'Procesado Completamente'
+    FAILED = 'FAILED', 'Error en el Pipeline'
+
+class SpatialPlan(models.Model):
+    """
+    Plano físico (imagen/blueprint) aplicable a CUALQUIER componente espacial 
+    (Campus, Edificio o Planta) gracias al framework de relaciones genéricas de Django.
+    Cumple estrictamente con OCP.
+    """
+    # Relación Genérica (Apunta a Campus, Building o Floor de forma polimórfica)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    spatial_object = GenericForeignKey('content_type', 'object_id')
+
+    # Archivo físico del plano
+    image = models.ImageField(upload_to='spatial_plans/%Y/%m/%d/', help_text="Archivo de imagen del plano (PNG/JPG/SVG)")
+    
+    # Máquina de Estados Estricta
+    status = models.CharField(
+        max_length=20, 
+        choices=SpatialPlanStatus.choices, 
+        default=SpatialPlanStatus.UPLOADED,
+        db_index=True
+    )
+    
+    # Control de Idempotencia (Evita procesar dos veces el mismo archivo exacto)
+    file_hash = models.CharField(max_length=64, unique=True, help_text="Hash SHA-256 del archivo")
+    
+    # Frontera de Datos: Contrato intermedio guardado tras la validación de Pydantic
+    intermediate_proposal = models.JSONField(blank=True, null=True, help_text="Esquema JSON normalizado de la propuesta")
+    
+    # Trazabilidad, Auditoría y Control de Costes de la IA
+    ai_metadata = models.JSONField(
+        default=dict, 
+        blank=True, 
+        help_text="Métricas de ejecución: {prompt, tokens_used, cost_usd, provider_name}"
+    )
+    error_log = models.TextField(blank=True, null=True, help_text="Traza detallada del error si el estado es FAILED")
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        # Un objeto espacial (ej: una Planta concreta) solo puede tener UN plano activo asociado
+        unique_together = ('content_type', 'object_id')
+
+    def save(self, *args, **kwargs):
+        """Idempotencia: Calcula el hash SHA-256 del archivo antes de guardarlo en disco/DB."""
+        if self.image and not self.file_hash:
+            hasher = hashlib.sha256()
+            for chunk in self.image.chunks():
+                hasher.update(chunk)
+            self.file_hash = hasher.hexdigest()
+        super().save(*args, **kwargs)
+
+    def transition_to(self, new_status: SpatialPlanStatus, error_message: str = None):
+        """Garante atómico del ciclo de vida de la máquina de estados."""
+        self.status = new_status
+        if error_message:
+            self.error_log = error_message
+        self.save(update_fields=['status', 'error_log', 'updated_at'])
+
+    def __str__(self):
+        return f"Plano de {self.spatial_object} - Estado: {self.status}"
 
 class Campus(models.Model, SpatialComponent):
     """Representa el recinto universitario global."""
