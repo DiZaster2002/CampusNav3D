@@ -83,7 +83,9 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 env = environ.Env()
 DATABASES = {
-    'default': env.db_url('DATABASE_URL')
+    'default': env.db_url(
+        'DATABASE_URL',
+        default='postgis://postgres:postgres@db:5432/campusnav3d_db')
 }
 
 DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
@@ -129,3 +131,15 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Configuración de Celery & Redis
+# Apuntamos al contenedor de Redis por su nombre de servicio 'redis'
+CELERY_BROKER_URL = 'redis://redis:6379/0'
+CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
+
+# Validaciones estrictas recomendadas
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = TIME_ZONE  # Usa el mismo Timezone de Django
