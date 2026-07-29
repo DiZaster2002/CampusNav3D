@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+import sys
 import environ
 import os
 
@@ -27,7 +28,7 @@ SECRET_KEY = 'django-insecure-r%+86c6i@uf=gs_pc)*p-b7bihz!5ihydn25j1@!dmo0d%sp(9
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -85,7 +86,7 @@ env = environ.Env()
 DATABASES = {
     'default': env.db_url(
         'DATABASE_URL',
-        default='postgis://postgres:postgres@db:5432/campusnav3d_db')
+        default='postgis://postgres:campus_secure_pass_2026@db:5432/campusnav3d')
 }
 
 DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
@@ -143,3 +144,9 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE  # Usa el mismo Timezone de Django
+
+
+# 🚀 Detección automática del entorno de pruebas
+if 'test' in sys.argv or 'pytest' in sys.modules:
+    CELERY_TASK_ALWAYS_EAGER = True
+    CELERY_TASK_EAGER_PROPAGATES = True
