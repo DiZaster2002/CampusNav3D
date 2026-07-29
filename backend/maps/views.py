@@ -16,6 +16,7 @@ from .serializers import (
 from .tasks import process_spatial_plan_task
 from django.contrib.gis.geos import Polygon
 from django.shortcuts import get_object_or_404  
+from django.db import transaction
 from rest_framework.views import APIView         
 
 ######## VIEWSETS GEOJSON ########
@@ -82,6 +83,7 @@ class SpatialPlanApproveView(APIView):
     Convierte el draft_data (o la versión editada) en objetos GIS reales (Space)
     y marca el plano como APPROVED.
     """
+    @transaction.atomic
     def post(self, request, pk):
         plan = get_object_or_404(SpatialPlan, pk=pk)
 
@@ -158,6 +160,7 @@ class SpatialPlanRejectView(APIView):
     POST /api/plans/<id>/reject/
     Marca un plano como FAILED/Rechazado indicando el motivo.
     """
+    @transaction.atomic
     def post(self, request, pk):
         plan = get_object_or_404(SpatialPlan, pk=pk)
 
