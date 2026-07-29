@@ -32,7 +32,9 @@ class SpatialPlanStatus(models.TextChoices):
     PREPROCESSING = 'PREPROCESSING', 'Preprocesando Imagen'
     EXTRACTING = 'EXTRACTING', 'Extrayendo con IA'
     REQUIRES_REVIEW = 'REQUIRES_REVIEW', 'Requiere Revisión Manual'
-    PROCESSED = 'PROCESSED', 'Procesado Completamente'
+    PROCESSED = 'PROCESSED', 'Procesado Completamente',
+    APPROVED = 'APPROVED', 'Aprobado y Persistido',
+    REJECTED = 'REJECTED', 'Rechazado por el Revisor',
     FAILED = 'FAILED', 'Error en el Pipeline'
 
 class SpatialPlan(models.Model):
