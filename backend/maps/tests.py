@@ -7,16 +7,16 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.gis.geos import Polygon
+from django.contrib.gis.geos import Polygon, LineString
 from django.urls import reverse
 from unittest.mock import patch
 from rest_framework import status
 from rest_framework.test import APITestCase
 from .models import Campus, Space, NavigationEdge
 from .patterns import SpatialEntityFactory, ImportComposite, CampusImportStep, BuildingImportStep, FloorImportStep
-from maps.models import Campus, Building, Floor, SpatialPlan, SpatialPlanStatus
+from maps.models import Campus, Building, Floor, SpatialPlan, SpatialPlanStatus, Space, NavigationEdge
 from maps.tasks import process_spatial_plan_task
-
+from maps.graph_builder import GraphBuilder
 
 
 class GeoSpatialPipelineTestCase(APITestCase):
@@ -744,3 +744,108 @@ class SpatialPlanRejectTests(APITestCase):
         plan_approved.refresh_from_db()
         # El estado debe mantenerse intacto
         self.assertEqual(plan_approved.status, SpatialPlanStatus.APPROVED)
+
+
+#################### TEST SUITE DE INTEGRACIÓN PARA EL CREADOR DE GRAFOS ####################
+class GraphBuilderTestCase(TestCase):
+    """
+    Pruebas unitarias e integración para el servicio GraphBuilder.
+    Verifica la conversión de entidades PostGIS a un grafo de NetworkX.
+    """
+
+    def setUp(self):
+        # 1. Crear Jerarquía de Dominio (Campus -> Edificio -> Planta)
+        self.campus = Campus.objects.create(
+            name="Campus Central",
+            slug="campus-central",
+            geometry=Polygon(((0, 0), (0, 100), (100, 100), (100, 0), (0, 0)))
+        )
+        self.building = Building.objects.create(
+            campus=self.campus,
+            name="Edificio de Politécnica",
+            code="EPS-I",
+            geometry=Polygon(((10, 10), (10, 50), (50, 50), (50, 10), (10, 10)))
+        )
+        self.floor = Floor.objects.create(
+            building=self.building,
+            level=0,
+            name="Planta Baja",
+            geometry=Polygon(((10, 10), (10, 50), (50, 50), (50, 10), (10, 10)))
+        )
+
+        # 2. Crear Espacios (Nodos)
+        self.space_a = Space.objects.create(
+            floor=self.floor,
+            name="Aula 101",
+            space_type="ROOM",
+            geometry=Polygon(((10, 10), (10, 20), (20, 20), (20, 10), (10, 10)))
+        )
+        self.space_b = Space.objects.create(
+            floor=self.floor,
+            name="Pasillo Principal",
+            space_type="CORRIDOR",
+            geometry=Polygon(((20, 10), (20, 20), (30, 20), (30, 10), (20, 10)))
+        )
+        self.space_c = Space.objects.create(
+            floor=self.floor,
+            name="Escalera A",
+            space_type="STAIRS",
+            geometry=Polygon(((30, 10), (30, 20), (40, 20), (40, 10), (30, 10)))
+        )
+
+        # 3. Crear Aristas de Navegación (Edges)
+        # Tramo A -> B (Accesible)
+        self.edge_accessible = NavigationEdge.objects.create(
+            name="Aula101-Pasillo",
+            source_space=self.space_a,
+            target_space=self.space_b,
+            geometry=LineString((15, 15), (25, 15)),
+            is_accessible=True
+        )
+
+        # Tramo B -> C (No accesible por escaleras)
+        self.edge_inaccessible = NavigationEdge.objects.create(
+            name="Pasillo-Escalera",
+            source_space=self.space_b,
+            target_space=self.space_c,
+            geometry=LineString((25, 15), (35, 15)),
+            is_accessible=False
+        )
+
+    def test_build_full_graph(self):
+        """Verifica que se construya el grafo completo con todos los nodos y aristas."""
+        graph = GraphBuilder.build_graph()
+
+        self.assertEqual(graph.number_of_nodes(), 3)
+        self.assertEqual(graph.number_of_edges(), 2)
+        
+        # Verificar atributos del nodo
+        node_data = graph.nodes[self.space_a.id]
+        self.assertEqual(node_data['name'], "Aula 101")
+        self.assertEqual(node_data['space_type'], "ROOM")
+        self.assertEqual(node_data['building_code'], "EPS-I")
+
+        # Verificar atributos de la arista
+        edge_data = graph.edges[self.space_a.id, self.space_b.id]
+        self.assertTrue(edge_data['is_accessible'])
+        self.assertGreater(edge_data['weight'], 0.0)
+
+    def test_filter_by_building(self):
+        """Verifica el filtrado correcto de nodos por edificio."""
+        graph = GraphBuilder.build_graph(building_id=self.building.id)
+        self.assertEqual(graph.number_of_nodes(), 3)
+
+        # Probar con un ID de edificio inexistente
+        empty_graph = GraphBuilder.build_graph(building_id=9999)
+        self.assertEqual(empty_graph.number_of_nodes(), 0)
+
+    def test_filter_only_accessible(self):
+        """Verifica que el flag only_accessible excluya las aristas no adaptadas a PMR."""
+        graph = GraphBuilder.build_graph(only_accessible=True)
+
+        self.assertEqual(graph.number_of_nodes(), 3)
+        self.assertEqual(graph.number_of_edges(), 1)
+        
+        # La arista accesible existe, la inaccesible no
+        self.assertTrue(graph.has_edge(self.space_a.id, self.space_b.id))
+        self.assertFalse(graph.has_edge(self.space_b.id, self.space_c.id))
