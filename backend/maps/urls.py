@@ -11,6 +11,7 @@ from .views import (
     SpatialPlanApproveView,
     SpatialPlanRejectView,
     SpatialPlanListView,
+    RouteAPIView
 )
 
 router = DefaultRouter()
@@ -26,5 +27,6 @@ urlpatterns = [
     path('plans/upload/', SpatialPlanUploadView.as_view(), name='plan-upload'),
     path('plans/<int:pk>/status/', SpatialPlanStatusView.as_view(), name='plan-status'),
     path('plans/<int:pk>/approve/', SpatialPlanApproveView.as_view(), name='plan-approve'), 
-    path('plans/<int:pk>/reject/', SpatialPlanRejectView.as_view(), name='plan-reject'),    
+    path('plans/<int:pk>/reject/', SpatialPlanRejectView.as_view(), name='plan-reject'),  
+    path('route/', RouteAPIView.as_view(), name='navigation-route'),
 ]
