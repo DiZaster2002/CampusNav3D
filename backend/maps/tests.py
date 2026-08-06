@@ -1,6 +1,7 @@
 import os
 import json
 import io
+import networkx as nx
 from PIL import Image
 from django.test import TestCase
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -17,6 +18,10 @@ from .patterns import SpatialEntityFactory, ImportComposite, CampusImportStep, B
 from maps.models import Campus, Building, Floor, SpatialPlan, SpatialPlanStatus, Space, NavigationEdge
 from maps.tasks import process_spatial_plan_task
 from maps.graph_builder import GraphBuilder
+from .routing_strategies import FastestPathStrategy, AccessiblePathStrategy
+from .navigation_facade import NavigationFacade
+from .graph_builder import GraphBuilder
+
 
 
 class GeoSpatialPipelineTestCase(APITestCase):
@@ -849,3 +854,90 @@ class GraphBuilderTestCase(TestCase):
         # La arista accesible existe, la inaccesible no
         self.assertTrue(graph.has_edge(self.space_a.id, self.space_b.id))
         self.assertFalse(graph.has_edge(self.space_b.id, self.space_c.id))
+
+
+#################### TEST SUITE DE INTEGRACIÓN PARA EL MÓDULO DE ENRUTADO ####################
+class RoutingModuleTestCase(TestCase):
+    """
+    Suite de pruebas unitarias e integración para el módulo de navegación interior.
+    """
+
+    def setUp(self):
+        """Configuración del entorno de pruebas con datos en PostGIS."""
+        self.campus = Campus.objects.create(
+            name='Campus Test', 
+            slug='campus-test',
+            geometry=Polygon(((0, 0), (0, 100), (100, 100), (100, 0), (0, 0)))
+        )
+        self.building = Building.objects.create(
+            campus=self.campus, 
+            name='Edificio Test', 
+            code='EST-1',
+            geometry=Polygon(((10, 10), (10, 90), (90, 90), (90, 10), (10, 10)))
+        )
+        self.floor = Floor.objects.create(
+            building=self.building, 
+            level=0, 
+            name='Planta Baja',
+            geometry=Polygon(((10, 10), (10, 90), (90, 90), (90, 10), (10, 10)))
+        )
+
+        # Nodos / Espacios
+        self.s1 = Space.objects.create(floor=self.floor, name='Origen', space_type='CORRIDOR', geometry=Polygon(((10,10),(10,20),(20,20),(20,10),(10,10))))
+        self.s2 = Space.objects.create(floor=self.floor, name='Escalera', space_type='STAIRS', geometry=Polygon(((20,10),(20,20),(30,20),(30,10),(20,10))))
+        self.s3 = Space.objects.create(floor=self.floor, name='Rampa PMR', space_type='CORRIDOR', geometry=Polygon(((10,20),(10,30),(20,30),(20,20),(10,20))))
+        self.s4 = Space.objects.create(floor=self.floor, name='Destino', space_type='ROOM', geometry=Polygon(((30,10),(30,20),(40,20),(40,10),(30,10))))
+        self.s5_isolated = Space.objects.create(floor=self.floor, name='Aislado', space_type='ROOM', geometry=Polygon(((80,80),(80,90),(90,90),(90,80),(80,80))))
+
+        # Aristas: Ruta A (Inaccesible, Distancia = 2.0) vs Ruta B (Accesible, Distancia = 6.0)
+        NavigationEdge.objects.create(name='E1-2', source_space=self.s1, target_space=self.s2, geometry=LineString((15,15),(25,15)), is_accessible=False)
+        NavigationEdge.objects.create(name='E2-4', source_space=self.s2, target_space=self.s4, geometry=LineString((25,15),(35,15)), is_accessible=True)
+        NavigationEdge.objects.create(name='E1-3', source_space=self.s1, target_space=self.s3, geometry=LineString((15,15),(15,25)), is_accessible=True)
+        NavigationEdge.objects.create(name='E3-4', source_space=self.s3, target_space=self.s4, geometry=LineString((15,25),(35,15)), is_accessible=True)
+
+    # --- Pruebas Unitarias de Estrategias ---
+
+    def test_fastest_path_strategy_selects_shortest_route(self):
+        """Verifica que FastestPathStrategy elija la ruta de menor distancia ignorando accesibilidad."""
+        graph = GraphBuilder.build_graph()
+        route = FastestPathStrategy().calculate_route(graph, self.s1.id, self.s4.id)
+        
+        self.assertEqual(route['strategy'], 'fastest')
+        self.assertEqual(route['path'], [self.s1.id, self.s2.id, self.s4.id])
+
+    def test_accessible_path_strategy_filters_inaccessible_edges(self):
+        """Verifica que AccessiblePathStrategy evite tramos no adaptados a PMR."""
+        graph = GraphBuilder.build_graph()
+        route = AccessiblePathStrategy().calculate_route(graph, self.s1.id, self.s4.id)
+        
+        self.assertEqual(route['strategy'], 'accessible')
+        self.assertEqual(route['path'], [self.s1.id, self.s3.id, self.s4.id])
+        self.assertTrue(route['is_accessible'])
+
+    def test_unreachable_node_returns_error_response(self):
+        """Verifica la respuesta cuando no existe conexión hacia un nodo."""
+        graph = GraphBuilder.build_graph()
+        route = FastestPathStrategy().calculate_route(graph, self.s1.id, self.s5_isolated.id)
+        
+        self.assertEqual(route['path'], [])
+        self.assertIn('error', route)
+
+    # --- Pruebas de Integración con NavigationFacade ---
+
+    def test_facade_returns_enriched_spatial_data(self):
+        """Verifica que la fachada devuelva la estructura de metadatos completa."""
+        route = NavigationFacade.get_route(self.s1.id, self.s4.id, preference='accessible')
+        
+        self.assertIn('detailed_path', route)
+        self.assertEqual(len(route['detailed_path']), 3)
+        
+        first_step = route['detailed_path'][0]
+        self.assertEqual(first_step['id'], self.s1.id)
+        self.assertEqual(first_step['building_code'], 'EST-1')
+        self.assertEqual(first_step['floor_level'], 0)
+        self.assertEqual(len(first_step['coordinates']), 2)
+
+    def test_facade_fallback_to_default_strategy(self):
+        """Verifica que un valor de preferencia desconocido recaiga en la estrategia por defecto."""
+        route = NavigationFacade.get_route(self.s1.id, self.s4.id, preference='unknown_mode')
+        self.assertEqual(route['strategy'], 'fastest')
