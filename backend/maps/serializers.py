@@ -136,3 +136,17 @@ class SpatialPlanStatusSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at'
         ]
+
+class RouteQuerySerializer(serializers.Serializer):
+    """
+    Validador de parámetros de consulta GET para peticiones de navegación.
+    """
+    start_space_id = serializers.IntegerField(required=True, min_value=1)
+    target_space_id = serializers.IntegerField(required=True, min_value=1)
+    preference = serializers.ChoiceField(
+        choices=['fastest', 'accessible'], 
+        default='fastest', 
+        required=False
+    )
+    building_id = serializers.IntegerField(required=False, allow_null=True)
+    floor_id = serializers.IntegerField(required=False, allow_null=True)

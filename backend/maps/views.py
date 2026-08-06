@@ -11,13 +11,15 @@ from .serializers import (
     SpatialPlanUploadSerializer,
     SpatialPlanStatusSerializer,
     SpatialPlanApproveSerializer,
-    SpatialPlanListSerializer
+    SpatialPlanListSerializer,
+    RouteQuerySerializer
 )
 from .tasks import process_spatial_plan_task
 from django.contrib.gis.geos import Polygon
 from django.shortcuts import get_object_or_404  
 from django.db import transaction
-from rest_framework.views import APIView         
+from rest_framework.views import APIView      
+from .navigation_facade import NavigationFacade   
 
 ######## VIEWSETS GEOJSON ########
 class CampusViewSet(viewsets.ModelViewSet):
@@ -198,3 +200,40 @@ class SpatialPlanStatusView(generics.RetrieveAPIView):
     queryset = SpatialPlan.objects.all()
     serializer_class = SpatialPlanStatusSerializer
     lookup_field = 'pk'
+
+
+class RouteAPIView(APIView):
+    """
+    Endpoint REST para el cálculo de itinerarios interiores.
+    
+    GET /api/route/?start_space_id=1&target_space_id=5&preference=accessible
+    """
+
+    def get(self, request, *args, **kwargs):
+        serializer = RouteQuerySerializer(data=request.query_params)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        validated_data = serializer.validated_data
+
+        try:
+            route_data = NavigationFacade.get_route(
+                start_space_id=validated_data['start_space_id'],
+                target_space_id=validated_data['target_space_id'],
+                preference=validated_data.get('preference', 'fastest'),
+                building_id=validated_data.get('building_id'),
+                floor_id=validated_data.get('floor_id')
+            )
+
+            if "error" in route_data and not route_data["path"]:
+                return Response(route_data, status=status.HTTP_444_NOT_FOUND if hasattr(status, 'HTTP_444_NOT_FOUND') else status.HTTP_404_NOT_FOUND)
+
+            return Response(route_data, status=status.HTTP_200_OK)
+
+        except ValueError as e:
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response(
+                {"detail": "Error interno durante el cálculo de la ruta.", "error": str(e)}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
