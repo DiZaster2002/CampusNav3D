@@ -65,4 +65,4 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.SUCCESS("¡Pipeline ejecutado con éxito! El modelo espacial está completamente sincronizado."))
 
         except Exception as e:
-            raise CommandError(f"Transacción abortada debido a un error en el procesamiento espacial: {e}")
+            raise CommandError(f"Transacción abortada debido a un error en el procesamiento espacial: {e}") from e

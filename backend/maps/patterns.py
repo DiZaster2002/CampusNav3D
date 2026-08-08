@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 
-from django.contrib.gis.geos import GEOSGeometry
 from django.utils.text import slugify
 
+from .geometry_utils import ensure_valid_wgs84_geometry
 from .models import Building, Campus, Floor, NavigationEdge, Space
 
 
@@ -24,7 +24,7 @@ class CampusImportStep(SpatialImportStep):
             external_id=campus_data['external_id'],
             defaults={
                 'name': campus_data['name'],
-                'geometry': GEOSGeometry(campus_data['geometry']),
+                'geometry': ensure_valid_wgs84_geometry(campus_data['geometry'], 'campus geometry'),
             },
         )
         context['campus'] = campus
@@ -47,7 +47,7 @@ class BuildingImportStep(SpatialImportStep):
             defaults={
                 'name': building_data['name'],
                 'campus': campus,
-                'geometry': GEOSGeometry(building_data['geometry']),
+                'geometry': ensure_valid_wgs84_geometry(building_data['geometry'], 'building geometry'),
             },
         )
         context['building'] = building
@@ -71,7 +71,7 @@ class FloorImportStep(SpatialImportStep):
             defaults={
                 'name': floor_data['name'],
                 'altitude': floor_data['altitude'],
-                'geometry': GEOSGeometry(floor_data['geometry']),
+                'geometry': ensure_valid_wgs84_geometry(floor_data['geometry'], 'floor geometry'),
             },
         )
         context['floor'] = floor
@@ -95,7 +95,7 @@ class SpaceImportStep(SpatialImportStep):
                 defaults={
                     'name': space_data['name'],
                     'space_type': space_data['space_type'],
-                    'geometry': GEOSGeometry(space_data['geometry']),
+                    'geometry': ensure_valid_wgs84_geometry(space_data['geometry'], 'space geometry'),
                 },
             )
             spaces_map[space.external_id] = space
@@ -126,7 +126,7 @@ class NavigationEdgeImportStep(SpatialImportStep):
                 target_space=target,
                 defaults={
                     'name': edge_data['name'],
-                    'geometry': GEOSGeometry(edge_data['geometry']),
+                    'geometry': ensure_valid_wgs84_geometry(edge_data['geometry'], 'edge geometry'),
                     'is_accessible': True,
                 },
             )
