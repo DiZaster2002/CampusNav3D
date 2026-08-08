@@ -1,5 +1,5 @@
 import json
-from django.contrib.gis.geos import GEOSGeometry
+from .geometry_utils import ensure_valid_wgs84_geometry
 
 class SpatialEntityFactory:
     """
@@ -20,11 +20,11 @@ class SpatialEntityFactory:
     @classmethod
     def create(cls, entity_type: str, **kwargs):
         # Normalización geoespacial centralizada
-        if 'geometry' in kwargs and isinstance(kwargs['geometry'], (str, dict)):
+        if 'geometry' in kwargs and kwargs['geometry'] is not None:
             geom_data = kwargs['geometry']
             if isinstance(geom_data, dict):
                 geom_data = json.dumps(geom_data)
-            kwargs['geometry'] = GEOSGeometry(geom_data)
+            kwargs['geometry'] = ensure_valid_wgs84_geometry(geom_data)
 
         creator = cls._registry.get(entity_type.lower())
         if not creator:
