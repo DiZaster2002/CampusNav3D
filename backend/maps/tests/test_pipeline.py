@@ -7,8 +7,8 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from maps.models import Campus, Space, NavigationEdge
-from maps.factories import SpatialEntityFactory, BaseCreator
 from maps.patterns import (
+    SpatialEntityFactory,
     ImportComposite,
     CampusImportStep,
     BuildingImportStep,
@@ -187,6 +187,7 @@ class GeoSpatialPipelineTestCase(APITestCase):
 
     def test_factory_ocp_compliance(self):
         """Prueba que la fábrica puede expandirse en tiempo de ejecución sin modificarse."""
+        from maps.factories import SpatialEntityFactory, BaseCreator
         
         # 1. Registrar una entidad ficticia al vuelo
         @SpatialEntityFactory.register('mock_zone')
