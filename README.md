@@ -35,6 +35,7 @@ CampusNav3D persigue los siguientes objetivos principales:
 * Django REST Framework (DRF)
 * Celery
 * Redis
+* NetworkX
 
 ## Base de datos espacial
 
