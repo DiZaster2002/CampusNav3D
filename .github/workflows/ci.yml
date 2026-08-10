@@ -72,11 +72,16 @@ jobs:
           cache: pip
           cache-dependency-path: backend/requirements.txt
 
-      - name: Install system dependencies (cached)
-        uses: awalsh128/cache-apt-pkgs-action@v1.6.0
+      - name: Cache apt archives
+        uses: actions/cache@v4
         with:
-          packages: gdal-bin libgdal-dev libgeos-dev libproj-dev libblas-dev liblapack-dev
-          version: 1.0
+          path: /var/cache/apt/archives
+          key: apt-archives-${{ runner.os }}-gdal-geos-proj-v1
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gdal-bin libgdal-dev libgeos-dev libproj-dev
 
       - name: Install Python dependencies
         working-directory: backend
@@ -94,12 +99,12 @@ jobs:
 
   docker-validate:
     runs-on: ubuntu-latest
- 
+
     steps:
       - uses: actions/checkout@v7
- 
+
       - name: Validate docker-compose config
         run: docker compose config
- 
+
       - name: Build backend image
         run: docker build -t campusnav3d-backend:ci ./backend
