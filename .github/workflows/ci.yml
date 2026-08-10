@@ -7,7 +7,29 @@ on:
     branches: [main, master]
 
 jobs:
-  lint-and-test:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install flake8
+        run: pip install flake8
+
+      - name: Run lint
+        working-directory: backend
+        run: |
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=88 --statistics
+
+  test:
     runs-on: ubuntu-latest
 
     services:
@@ -50,23 +72,17 @@ jobs:
           cache: pip
           cache-dependency-path: backend/requirements.txt
 
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y gdal-bin libgdal-dev libgeos-dev libproj-dev
+      - name: Install system dependencies (cached)
+        uses: awalsh128/cache-apt-pkgs-action@v1.6.0
+        with:
+          packages: gdal-bin libgdal-dev libgeos-dev libproj-dev libblas-dev liblapack-dev
+          version: 1.0
 
       - name: Install Python dependencies
         working-directory: backend
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install flake8
-
-      - name: Run lint
-        working-directory: backend
-        run: |
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=88 --statistics
 
       - name: Run Django checks
         working-directory: backend
