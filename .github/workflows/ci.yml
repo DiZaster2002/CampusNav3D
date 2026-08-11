@@ -6,6 +6,13 @@ on:
   pull_request:
     branches: [main, master]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -60,6 +67,9 @@ jobs:
       DATABASE_URL: postgis://postgres:postgres@127.0.0.1:5432/campusnav3d_test
       CELERY_BROKER_URL: redis://127.0.0.1:6379/0
       CELERY_RESULT_BACKEND: redis://127.0.0.1:6379/0
+      DJANGO_SETTINGS_MODULE: core.settings
+      SECRET_KEY: django-insecure-ci-test-key-not-for-production
+      DEBUG: "False"
 
     steps:
       - uses: actions/checkout@v7
