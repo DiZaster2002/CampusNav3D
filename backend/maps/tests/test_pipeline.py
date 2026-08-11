@@ -4,9 +4,9 @@ from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase
 
 from maps.models import Campus, Space, NavigationEdge
+from .base import AuthenticatedAPITestCase
 from maps.patterns import (
     SpatialEntityFactory,
     ImportComposite,
@@ -15,7 +15,7 @@ from maps.patterns import (
     FloorImportStep,
 )
 
-class GeoSpatialPipelineTestCase(APITestCase):
+class GeoSpatialPipelineTestCase(AuthenticatedAPITestCase):
     """
     Suite de pruebas unitarias y de integración avanzada para la capa espacial, 
     patrones de diseño (Factory/Composite) y comandos de importación.

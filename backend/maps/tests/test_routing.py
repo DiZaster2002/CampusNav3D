@@ -2,15 +2,15 @@ from django.test import TestCase
 from django.urls import reverse
 from django.contrib.gis.geos import Polygon, LineString
 from rest_framework import status
-from rest_framework.test import APITestCase
 
 from maps.models import Campus, Building, Floor, Space, NavigationEdge
+from .base import AuthenticatedAPITestCase
 from maps.graph_builder import GraphBuilder
 from maps.routing_strategies import FastestPathStrategy, AccessiblePathStrategy
 from maps.navigation_facade import NavigationFacade
 
 
-class RoutingModuleTestCase(APITestCase):
+class RoutingModuleTestCase(AuthenticatedAPITestCase):
     """
     Suite de pruebas unitarias y de integración para las estrategias de cálculo
     de rutas, la fachada de navegación y los endpoints de itinerario.
