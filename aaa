@@ -89,3 +89,68 @@ volumes:
   postgres_data:
   redis_data:
   media_volume:
+
+  ##################################################################################3
+  
+  ##################################################################################3
+  
+  ##################################################################################3
+  
+  ##################################################################################3
+  
+  ##################################################################################3
+
+
+services:
+  db:
+    image: postgis/postgis:15-3.3-alpine
+    container_name: campusnav3d_postgis
+    environment:
+      POSTGRES_DB: campusnav3d
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: campus_secure_pass_2026
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: campusnav3d_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  web:
+    build: ./backend
+    container_name: campusnav3d_backend
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgis://postgres:campus_secure_pass_2026@db:5432/campusnav3d
+    depends_on:
+      - db
+
+  celery:
+    build: ./backend
+    container_name: campusnav3d_celery
+    command: celery -A core worker -l info
+    volumes:
+      - ./backend:/app
+    environment:
+      - DJANGO_SETTINGS_MODULE=core.settings
+      - DATABASE_URL=postgis://postgres:campus_secure_pass_2026@db:5432/campusnav3d
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - redis
+      - db
+
+volumes:
+  postgres_data:
+  # Al final del archivo, asegúrate de declarar el volumen de Redis si usas persistencia:
+  redis_data:
