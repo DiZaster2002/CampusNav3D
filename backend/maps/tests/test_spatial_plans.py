@@ -9,13 +9,13 @@ from django.contrib.gis.geos import Polygon
 from django.urls import reverse
 
 from rest_framework import status
-from rest_framework.test import APITestCase
 
 from maps.models import Campus, Building, Floor, SpatialPlan, SpatialPlanStatus, Space
+from .base import AuthenticatedAPITestCase
 from maps.tasks import process_spatial_plan_task
 
 
-class SpatialPlanUploadTests(APITestCase):
+class SpatialPlanUploadTests(AuthenticatedAPITestCase):
     """Pruebas de integración para el endpoint de carga de planos (POST /api/plans/upload/)."""
 
     def setUp(self):
@@ -250,7 +250,7 @@ class SpatialPlanTaskTests(TestCase):
         self.assertEqual(self.plan.status, SpatialPlanStatus.FAILED)
         self.assertIn("Error simulado de extracción por IA", str(self.plan.error_log))
 
-class SpatialPlanQueryTests(APITestCase):
+class SpatialPlanQueryTests(AuthenticatedAPITestCase):
     """Pruebas de integración para endpoints de consulta (GET /api/plans/ y GET /api/plans/<id>/status/)."""
 
     def setUp(self):
@@ -345,7 +345,7 @@ class SpatialPlanQueryTests(APITestCase):
         self.assertIn('file_hash', first_item)
         self.assertIn('created_at', first_item)
 
-class SpatialPlanApproveTests(APITestCase):
+class SpatialPlanApproveTests(AuthenticatedAPITestCase):
     """Pruebas de integración para la aprobación de planos y persistencia GIS (POST /api/plans/<id>/approve/)."""
 
     def setUp(self):
@@ -502,7 +502,7 @@ class SpatialPlanApproveTests(APITestCase):
         self.assertEqual(self.plan_review.status, SpatialPlanStatus.REQUIRES_REVIEW)
         self.assertEqual(Space.objects.filter(floor=self.floor).count(), 0)
 
-class SpatialPlanRejectTests(APITestCase):
+class SpatialPlanRejectTests(AuthenticatedAPITestCase):
     """Pruebas de integración para el rechazo manual de planos (POST /api/plans/<id>/reject/)."""
 
     def setUp(self):

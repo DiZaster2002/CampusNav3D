@@ -1,12 +1,12 @@
 from django.urls import reverse
 from django.contrib.gis.geos import Polygon, LineString
 from rest_framework import status
-from rest_framework.test import APITestCase
 
 from maps.models import Campus, Building, Floor, Space, NavigationEdge
+from .base import AuthenticatedAPITestCase
 
 
-class MapsAPITestCase(APITestCase):
+class MapsAPITestCase(AuthenticatedAPITestCase):
     """
     Suite de pruebas de integración para la API REST del módulo de mapas,
     cobertura de serializadores GeoJSON y endpoints de consulta CRUD/Read-Only.
