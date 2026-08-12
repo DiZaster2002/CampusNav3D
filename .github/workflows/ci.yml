@@ -86,7 +86,7 @@ jobs:
           cache-dependency-path: backend/requirements.txt
 
       - name: Cache apt archives
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: /var/cache/apt/archives
           key: apt-archives-${{ runner.os }}-gdal-geos-proj-v1
