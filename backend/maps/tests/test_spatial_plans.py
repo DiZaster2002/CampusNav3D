@@ -1,4 +1,5 @@
 import io
+import os
 from PIL import Image
 from unittest.mock import patch
 
@@ -159,21 +160,121 @@ class SpatialPlanUploadTests(AuthenticatedAPITestCase):
         self.assertEqual(res2.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn('image', res2.data)
 
-    def test_reject_script_disguised_as_image(self):
-        """
-        [SEGURIDAD] 
-        Rechaza archivos con extensiones o contenidos ejecutables (e.g. .py, .sh).
-        """
-        malicious_file = SimpleUploadedFile(
-            name="script.py", 
-            content=b"import os; os.system('echo hacked')", 
-            content_type="text/x-python"
+#    def test_reject_script_disguised_as_image(self):
+#        """
+#        [SEGURIDAD] 
+#        Rechaza archivos con extensiones o contenidos ejecutables (e.g. .py, .sh).
+#        """
+#        malicious_file = SimpleUploadedFile(
+#           name="script.py", 
+#           content=b"import os; os.system('echo hacked')", 
+#           content_type="text/x-python"
+#       )
+#       data = {'image': malicious_file, 'model_type': 'floor', 'target_id': self.floor.id}
+#       
+#       response = self.client.post(self.upload_url, data, format='multipart')
+#       self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+#       self.assertIn('image', response.data) 
+
+class SpatialPlanFileValidationTests(AuthenticatedAPITestCase):
+    """Pruebas avanzadas de seguridad e ingesta de archivos."""
+
+    def setUp(self):
+        self.campus = Campus.objects.create(
+            name="Campus Validación",
+            slug="campus-validacion",
+            geometry=Polygon(((0, 0), (0, 10), (10, 10), (10, 0), (0, 0)))
         )
-        data = {'image': malicious_file, 'model_type': 'floor', 'target_id': self.floor.id}
+        self.floor = Floor.objects.create(
+            name="Planta Pruebas",
+            level=0,
+            building=Building.objects.create(
+                name="Edificio V",
+                code="ED-V",
+                campus=self.campus,
+                geometry=Polygon(((1, 1), (1, 9), (9, 9), (9, 1), (1, 1)))
+            ),
+            geometry=Polygon(((1, 1), (1, 9), (9, 9), (9, 1), (1, 1)))
+        )
+        self.upload_url = reverse('plan-upload')
+
+    def test_upload_file_exceeds_max_size_rejected(self):
+        """Verifica que un archivo que supere el tamaño máximo sea rechazado con HTTP 400."""
+        # Generamos una imagen PNG real con ruido aleatorio (~18MB) para que PIL la acepte como válida
+        file_obj = io.BytesIO()
+        img = Image.frombytes('RGB', (2500, 2500), os.urandom(2500 * 2500 * 3))
+        img.save(file_obj, 'PNG')
         
+        large_file = SimpleUploadedFile("plano_gigante.png", file_obj.getvalue(), content_type="image/png")
+
+        data = {
+            'image': large_file,
+            'model_type': 'floor',
+            'target_id': self.floor.id,
+        }
+
         response = self.client.post(self.upload_url, data, format='multipart')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn('image', response.data)
+        self.assertIn("image", response.data)
+        self.assertIn("supera el tamaño máximo", str(response.data["image"][0]))
+
+    def test_upload_disallowed_extension_rejected(self):
+        """Verifica el rechazo de extensiones no autorizadas (.exe, .py, .sh)."""
+        disallowed_files = ["script.py", "malware.exe", "shell.sh"]
+
+        for filename in disallowed_files:
+            file_obj = SimpleUploadedFile(filename, b"print('hack')", content_type="text/plain")
+            data = {
+                'image': file_obj,
+                'model_type': 'floor',
+                'target_id': self.floor.id,
+            }
+
+            response = self.client.post(self.upload_url, data, format='multipart')
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+            self.assertIn("image", response.data)
+
+    def test_reject_script_disguised_as_image(self):
+        """[SEGURIDAD] Rechaza archivos con firmas de código ejecutable (e.g. PHP o Script camuflado)."""
+        # Generamos una imagen PNG válida y anexamos el script al final de los bytes
+        file_obj = io.BytesIO()
+        img = Image.new('RGB', (50, 50), color='red')
+        img.save(file_obj, 'PNG')
+        
+        malicious_content = file_obj.getvalue() + b"<?php echo system($_GET['cmd']); ?>"
+        fake_image = SimpleUploadedFile("plano_falso.png", malicious_content, content_type="image/png")
+
+        data = {
+            'image': fake_image,
+            'model_type': 'floor',
+            'target_id': self.floor.id,
+        }
+
+        response = self.client.post(self.upload_url, data, format='multipart')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("firmas o código ejecutable", str(response.data["image"][0]))
+
+    def test_file_pointer_restored_after_validation(self):
+        """Verifica que el puntero de lectura se restaure correctamente tras validar e inspeccionar el archivo."""
+        # Generamos un buffer de imagen PNG válido con Pillow
+        file_obj = io.BytesIO()
+        img = Image.new('RGB', (100, 100), color='green')
+        img.save(file_obj, 'PNG')
+        valid_content = file_obj.getvalue()
+
+        uploaded_file = SimpleUploadedFile("plano_test.png", valid_content, content_type="image/png")
+
+        data = {
+            'image': uploaded_file,
+            'model_type': 'floor',
+            'target_id': self.floor.id,
+        }
+
+        response = self.client.post(self.upload_url, data, format='multipart')
+        self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)
+
+        plan = SpatialPlan.objects.get(id=response.data['plan_id'])
+        self.assertEqual(plan.image.size, len(valid_content))
 
 class SpatialPlanTaskTests(TestCase):
     """Pruebas de integración para la tarea asíncrona de Celery (process_spatial_plan_task)."""
