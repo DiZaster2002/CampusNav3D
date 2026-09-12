@@ -1,8 +1,26 @@
 import hashlib
+import os
 from rest_framework_gis.serializers import GeoFeatureModelSerializer
 from rest_framework import serializers
 from django.contrib.contenttypes.models import ContentType
+from django.conf import settings
 from .models import Campus, Building, Floor, Space, NavigationEdge, SpatialPlan
+
+# Extensiones y tipos MIME autorizados para planos espaciales
+ALLOWED_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.pdf', '.dxf', '.geojson', '.json']
+ALLOWED_MIME_TYPES = [
+    'image/png',
+    'image/jpeg',
+    'application/pdf',
+    'application/json',
+    'application/geo+json',
+    'image/vnd.dxf',
+    'application/dxf',
+    'text/plain',
+]
+
+# Límite por defecto de 10 MB si no está definido en settings
+MAX_FILE_SIZE = getattr(settings, 'FILE_UPLOAD_MAX_MEMORY_SIZE', 10 * 1024 * 1024)
 
 
 ########## SERIALIZADORES GEOJSON ##########
@@ -58,6 +76,49 @@ class SpatialPlanUploadSerializer(serializers.ModelSerializer):
         model = SpatialPlan
         fields = ['id', 'image', 'model_type', 'target_id', 'ai_provider', 'created_at']
         read_only_fields = ['id', 'created_at']
+
+    def validate_image(self, value):
+        """
+        Validaciones de seguridad a nivel de campo: tamaño, extensión,
+        tipo MIME e inspección de contenido (scripts o ejecutables).
+        """
+        # 1. Validación de Tamaño Máximo
+        if value.size > MAX_FILE_SIZE:
+            max_mb = MAX_FILE_SIZE / (1024 * 1024)
+            raise serializers.ValidationError(
+                f"El archivo supera el tamaño máximo permitido de {max_mb:.1f} MB."
+            )
+
+        # 2. Validación de Extensión
+        ext = os.path.splitext(value.name)[1].lower()
+        if ext not in ALLOWED_EXTENSIONS:
+            raise serializers.ValidationError(
+                f"Extensión '{ext}' no permitida. Formatos aceptados: {', '.join(ALLOWED_EXTENSIONS)}"
+            )
+
+        # 3. Validación de Tipo MIME (si el cliente lo proporciona)
+        content_type = getattr(value, 'content_type', '').lower()
+        if content_type and content_type not in ALLOWED_MIME_TYPES:
+            raise serializers.ValidationError(
+                f"Tipo de contenido '{content_type}' no válido para un plano espacial."
+            )
+
+        # 4. Inspección de Cabecera contra Scripts Disfrazados (RCE Prevention)
+        file_head = value.read(1024)
+        value.seek(0)  # Restaurar siempre el puntero de lectura para usos posteriores
+
+        danger_patterns = [
+            b'<?php', b'<script', b'#!/bin/', b'#!/usr/bin',
+            b'eval(', b'system(', b'passthru(', b'exec('
+        ]
+        
+        head_lower = file_head.lower()
+        if any(pattern in head_lower for pattern in danger_patterns):
+            raise serializers.ValidationError(
+                "El archivo contiene firmas o código ejecutable no permitido."
+            )
+
+        return value
 
     def validate(self, attrs):
         model_name = attrs.get('model_type').lower()
