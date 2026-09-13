@@ -94,6 +94,7 @@ INSTALLED_APPS = [
     # Módulos Geoespaciales y Aplicaciones del Proyecto
     'django.contrib.gis',
     'rest_framework',
+    'rest_framework.authtoken',
     'rest_framework_gis',
     'maps',
 ]
