@@ -1,6 +1,5 @@
 from django.shortcuts import get_object_or_404
 from ..models import SpatialPlan, SpatialPlanStatus
-from ..tasks import process_spatial_plan_task
 
 
 class PlanService:
@@ -9,6 +8,8 @@ class PlanService:
     @staticmethod
     def upload_and_enqueue_plan(serializer) -> SpatialPlan:
         """Persiste la subida del plano e inicia el job asíncrono en Celery."""
+        from ..tasks import process_spatial_plan_task
+        
         ai_provider = serializer.validated_data.get('ai_provider', 'mock')
 
         spatial_plan = serializer.save(
