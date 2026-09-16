@@ -1,4 +1,8 @@
-from django.contrib.gis.geos import GEOSGeometry
+
+import json
+from django.contrib.gis.geos import GEOSGeometry, GEOSException
+from rest_framework import serializers
+from rest_framework_gis.fields import GeometryField
 
 
 def ensure_valid_wgs84_geometry(value, field_name='geometry'):
@@ -25,6 +29,48 @@ def ensure_valid_wgs84_geometry(value, field_name='geometry'):
             )
 
     return geometry
+
+class CustomGeometryField(GeometryField):
+    """
+    Campo espacial que serializa geometrías PostGIS a GeoJSON en GET
+    y valida la topología GeoJSON / límites WGS84 en POST/PUT.
+    """
+
+    def to_internal_value(self, value):
+        # 1. Validaciones previas de la estructura GeoJSON
+        if isinstance(value, dict) and value.get('type') == 'Polygon':
+            coords = value.get('coordinates', [])
+            if coords:
+                outer_ring = coords[0]
+
+                if len(outer_ring) < 4:
+                    raise serializers.ValidationError(
+                        f"Geometría inválida: Un polígono requiere al menos 4 puntos. Se enviaron {len(outer_ring)}."
+                    )
+
+                if outer_ring[0] != outer_ring[-1]:
+                    raise serializers.ValidationError(
+                        "Geometría abierta: El primer punto debe ser idéntico al último para cerrar el polígono."
+                    )
+
+        # 2. Procesamiento estándar de DRF-GIS para convertir a GEOSGeometry
+        try:
+            geom = super().to_internal_value(value)
+        except (serializers.ValidationError, GEOSException, ValueError):
+            raise serializers.ValidationError(
+                "Formato GeoJSON no reconocido o estructura espacial corrupta."
+            )
+
+        # 3. Comprobación de límites geográficos WGS84
+        for coord in _iter_coordinates(geom):
+            if len(coord) >= 2:
+                lon, lat = coord[0], coord[1]
+                if not (-180 <= lon <= 180 and -90 <= lat <= 90):
+                    raise serializers.ValidationError(
+                        f"Coordenadas fuera de límites WGS84: longitud={lon}, latitud={lat}."
+                    )
+
+        return geom
 
 
 def _iter_coordinates(geometry):
