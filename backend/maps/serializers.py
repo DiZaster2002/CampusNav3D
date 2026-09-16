@@ -5,6 +5,7 @@ from rest_framework import serializers
 from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
 from .models import Campus, Building, Floor, Space, NavigationEdge, SpatialPlan
+from .geometry_utils import CustomGeometryField
 
 # Extensiones y tipos MIME autorizados para planos espaciales
 ALLOWED_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.pdf', '.dxf', '.geojson', '.json']
@@ -26,6 +27,8 @@ MAX_FILE_SIZE = getattr(settings, 'FILE_UPLOAD_MAX_MEMORY_SIZE', 10 * 1024 * 102
 ########## SERIALIZADORES GEOJSON ##########
 class CampusSerializer(GeoFeatureModelSerializer):
     """Serializa objetos Campus al estándar GeoJSON."""
+    geometry = CustomGeometryField()
+
     class Meta:
         model = Campus
         geo_field = 'geometry'  # Indica cuál es el campo geométrico espacial
@@ -34,6 +37,8 @@ class CampusSerializer(GeoFeatureModelSerializer):
 
 class BuildingSerializer(GeoFeatureModelSerializer):
     """Serializa objetos Building al estándar GeoJSON."""
+    geometry = CustomGeometryField()
+
     class Meta:
         model = Building
         geo_field = 'geometry'
@@ -42,6 +47,8 @@ class BuildingSerializer(GeoFeatureModelSerializer):
 
 class FloorSerializer(GeoFeatureModelSerializer):
     """Serializa objetos Floor al estándar GeoJSON."""
+    geometry = CustomGeometryField()
+
     class Meta:
         model = Floor
         geo_field = 'geometry'
@@ -50,6 +57,8 @@ class FloorSerializer(GeoFeatureModelSerializer):
 
 class SpaceSerializer(GeoFeatureModelSerializer):
     """Serializa las celdas IndoorGML al estándar GeoJSON."""
+    geometry = CustomGeometryField()
+
     class Meta:
         model = Space
         geo_field = 'geometry'
