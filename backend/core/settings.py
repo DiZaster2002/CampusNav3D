@@ -94,6 +94,7 @@ INSTALLED_APPS = [
 
     # Módulos Geoespaciales y Aplicaciones del Proyecto
     'django.contrib.gis',
+    'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_gis',
@@ -103,6 +104,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -196,6 +198,16 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE  # Usa el mismo Timezone de Django
+
+# Permitir todos los orígenes durante el desarrollo local (Docker/WSL2/Vite/React)
+CORS_ALLOW_ALL_ORIGINS = True
+
+# Si prefieres acotar explícitamente los orígenes permitidos:
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:3000",
+#     "http://127.0.0.1:3000",
+#     "http://localhost:5173",
+# ]""
 
 
 # 🚀 Detección automática del entorno de pruebas
