@@ -55,6 +55,7 @@ REST_FRAMEWORK = {
         'user': '1000/day',
     },
     'INDENT': 4,  # Indentación para respuestas JSON legibles
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema'
 }
 
 
@@ -95,6 +96,7 @@ INSTALLED_APPS = [
     # Módulos Geoespaciales y Aplicaciones del Proyecto
     'django.contrib.gis',
     'corsheaders',
+    'drf_spectacular',
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_gis',
@@ -214,3 +216,10 @@ CORS_ALLOW_ALL_ORIGINS = True
 if 'test' in sys.argv or 'pytest' in sys.modules:
     CELERY_TASK_ALWAYS_EAGER = True
     CELERY_TASK_EAGER_PROPAGATES = True
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'CampusNav3D API',
+    'DESCRIPTION': 'API para la gestión, procesamiento vectorial y navegación espacial 2D/3D universitaria.',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}

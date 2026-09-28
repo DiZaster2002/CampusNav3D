@@ -199,6 +199,7 @@ class SpatialPlanStatusSerializer(serializers.ModelSerializer):
         fields = [
             'id', 
             'status', 
+            'image',
             'file_hash', 
             'intermediate_proposal', 
             'ai_metadata', 
