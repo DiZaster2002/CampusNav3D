@@ -2,6 +2,7 @@ from rest_framework import viewsets, status, generics
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 
 from .models import Campus, Building, Floor, Space, NavigationEdge, SpatialPlan
 from .serializers import (
@@ -24,26 +25,31 @@ from .navigation_facade import NavigationFacade
 class CampusViewSet(viewsets.ModelViewSet):
     queryset = Campus.objects.all()
     serializer_class = CampusSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
 class BuildingViewSet(viewsets.ModelViewSet):
     queryset = Building.objects.all()
     serializer_class = BuildingSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
 class FloorViewSet(viewsets.ModelViewSet):
     queryset = Floor.objects.all()
     serializer_class = FloorSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
 class SpaceViewSet(viewsets.ModelViewSet):
     queryset = Space.objects.all()
     serializer_class = SpaceSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
 class NavigationEdgeViewSet(viewsets.ModelViewSet):
     queryset = NavigationEdge.objects.all()
     serializer_class = NavigationEdgeSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
 ##### VIEWSETS / APIVIEWS PIPELINE ########
@@ -56,6 +62,7 @@ class SpatialPlanUploadView(generics.CreateAPIView):
     queryset = SpatialPlan.objects.all()
     serializer_class = SpatialPlanUploadSerializer
     parser_classes = (MultiPartParser, FormParser)
+    permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -80,6 +87,8 @@ class SpatialPlanApproveView(APIView):
     Convierte el draft_data (o la versión editada) en objetos GIS reales (Space)
     y marca el plano como APPROVED.
     """
+    permission_classes = [IsAuthenticated]
+
     def post(self, request, pk):
         serializer = SpatialPlanApproveSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -108,6 +117,8 @@ class SpatialPlanRejectView(APIView):
     POST /api/plans//reject/
     Marca un plano como REJECTED indicando el motivo.
     """
+    permission_classes = [IsAuthenticated]
+
     def post(self, request, pk):
         reason = request.data.get('reason', 'Sin motivo especificado')
 
@@ -131,6 +142,7 @@ class SpatialPlanListView(generics.ListAPIView):
     """
     queryset = SpatialPlan.objects.all().order_by('-created_at')
     serializer_class = SpatialPlanListSerializer
+    permission_classes = [IsAuthenticated]
 
 
 class SpatialPlanStatusView(generics.RetrieveAPIView):
@@ -141,6 +153,7 @@ class SpatialPlanStatusView(generics.RetrieveAPIView):
     queryset = SpatialPlan.objects.all()
     serializer_class = SpatialPlanStatusSerializer
     lookup_field = 'pk'
+    permission_classes = [IsAuthenticated]
 
 
 class RouteAPIView(APIView):
@@ -149,6 +162,8 @@ class RouteAPIView(APIView):
     
     GET /api/route/?start_space_id=1&target_space_id=5&preference=accessible
     """
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
     def get(self, request, *args, **kwargs):
         serializer = RouteQuerySerializer(data=request.query_params)
         if not serializer.is_valid():
