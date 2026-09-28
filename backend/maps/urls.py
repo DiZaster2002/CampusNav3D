@@ -1,5 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
+from rest_framework.authtoken.views import obtain_auth_token
 from .views import (
     CampusViewSet,
     BuildingViewSet,
@@ -23,6 +24,7 @@ router.register(r'edges', NavigationEdgeViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('login/', obtain_auth_token, name='api-token-auth'),
     path('plans/', SpatialPlanListView.as_view(), name='spatialplan-list'),
     path('plans/upload/', SpatialPlanUploadView.as_view(), name='plan-upload'),
     path('plans/<int:pk>/status/', SpatialPlanStatusView.as_view(), name='plan-status'),
