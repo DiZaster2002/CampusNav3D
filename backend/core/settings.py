@@ -14,6 +14,7 @@ from pathlib import Path
 import sys
 import environ
 import os
+from corsheaders.defaults import default_headers
 
 ######## SECURITY AND ENVIRONMENT VARIABLES ########
 
@@ -210,6 +211,10 @@ CORS_ALLOW_ALL_ORIGINS = True
 #     "http://127.0.0.1:3000",
 #     "http://localhost:5173",
 # ]""
+
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'authorization',
+]
 
 
 # 🚀 Detección automática del entorno de pruebas

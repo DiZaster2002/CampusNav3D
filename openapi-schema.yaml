@@ -1,0 +1,1749 @@
+openapi: 3.0.3
+info:
+  title: CampusNav3D API
+  version: 1.0.0
+  description: API para la gestión, procesamiento vectorial y navegación espacial
+    2D/3D universitaria.
+paths:
+  /api/buildings/:
+    get:
+      operationId: buildings_list
+      tags:
+      - buildings
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BuildingList'
+          description: ''
+    post:
+      operationId: buildings_create
+      tags:
+      - buildings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Building'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Building'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Building'
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Building'
+          description: ''
+  /api/buildings/{id}/:
+    get:
+      operationId: buildings_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this building.
+        required: true
+      tags:
+      - buildings
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Building'
+          description: ''
+    put:
+      operationId: buildings_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this building.
+        required: true
+      tags:
+      - buildings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Building'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Building'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Building'
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Building'
+          description: ''
+    patch:
+      operationId: buildings_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this building.
+        required: true
+      tags:
+      - buildings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedBuilding'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedBuilding'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedBuilding'
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Building'
+          description: ''
+    delete:
+      operationId: buildings_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this building.
+        required: true
+      tags:
+      - buildings
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/campuses/:
+    get:
+      operationId: campuses_list
+      tags:
+      - campuses
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampusList'
+          description: ''
+    post:
+      operationId: campuses_create
+      tags:
+      - campuses
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Campus'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Campus'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Campus'
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Campus'
+          description: ''
+  /api/campuses/{id}/:
+    get:
+      operationId: campuses_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this campus.
+        required: true
+      tags:
+      - campuses
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Campus'
+          description: ''
+    put:
+      operationId: campuses_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this campus.
+        required: true
+      tags:
+      - campuses
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Campus'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Campus'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Campus'
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Campus'
+          description: ''
+    patch:
+      operationId: campuses_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this campus.
+        required: true
+      tags:
+      - campuses
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCampus'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCampus'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCampus'
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Campus'
+          description: ''
+    delete:
+      operationId: campuses_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this campus.
+        required: true
+      tags:
+      - campuses
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/edges/:
+    get:
+      operationId: edges_list
+      tags:
+      - edges
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NavigationEdgeList'
+          description: ''
+    post:
+      operationId: edges_create
+      tags:
+      - edges
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NavigationEdge'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/NavigationEdge'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NavigationEdge'
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NavigationEdge'
+          description: ''
+  /api/edges/{id}/:
+    get:
+      operationId: edges_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this navigation edge.
+        required: true
+      tags:
+      - edges
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NavigationEdge'
+          description: ''
+    put:
+      operationId: edges_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this navigation edge.
+        required: true
+      tags:
+      - edges
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NavigationEdge'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/NavigationEdge'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NavigationEdge'
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NavigationEdge'
+          description: ''
+    patch:
+      operationId: edges_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this navigation edge.
+        required: true
+      tags:
+      - edges
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedNavigationEdge'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedNavigationEdge'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedNavigationEdge'
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NavigationEdge'
+          description: ''
+    delete:
+      operationId: edges_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this navigation edge.
+        required: true
+      tags:
+      - edges
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/floors/:
+    get:
+      operationId: floors_list
+      tags:
+      - floors
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FloorList'
+          description: ''
+    post:
+      operationId: floors_create
+      tags:
+      - floors
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Floor'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Floor'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Floor'
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Floor'
+          description: ''
+  /api/floors/{id}/:
+    get:
+      operationId: floors_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this floor.
+        required: true
+      tags:
+      - floors
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Floor'
+          description: ''
+    put:
+      operationId: floors_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this floor.
+        required: true
+      tags:
+      - floors
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Floor'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Floor'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Floor'
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Floor'
+          description: ''
+    patch:
+      operationId: floors_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this floor.
+        required: true
+      tags:
+      - floors
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedFloor'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedFloor'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedFloor'
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Floor'
+          description: ''
+    delete:
+      operationId: floors_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this floor.
+        required: true
+      tags:
+      - floors
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/login/:
+    post:
+      operationId: login_create
+      tags:
+      - login
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AuthToken'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AuthToken'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthToken'
+        required: true
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthToken'
+          description: ''
+  /api/plans/:
+    get:
+      operationId: plans_list
+      description: |-
+        GET /api/plans/
+        Devuelve la lista completa de planos registrados y sus estados actuales.
+      tags:
+      - plans
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SpatialPlanList'
+          description: ''
+  /api/plans/{id}/approve/:
+    post:
+      operationId: plans_approve_create
+      description: |-
+        POST /api/plans//approve/
+        Convierte el draft_data (o la versión editada) en objetos GIS reales (Space)
+        y marca el plano como APPROVED.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - plans
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/plans/{id}/reject/:
+    post:
+      operationId: plans_reject_create
+      description: |-
+        POST /api/plans//reject/
+        Marca un plano como REJECTED indicando el motivo.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - plans
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/plans/{id}/status/:
+    get:
+      operationId: plans_status_retrieve
+      description: |-
+        GET /api/plans//status/
+        Endpoint ligero para que el Frontend haga Polling sobre el progreso.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - plans
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpatialPlanStatus'
+          description: ''
+  /api/plans/upload/:
+    post:
+      operationId: plans_upload_create
+      description: |-
+        POST /api/plans/upload/
+        Recibe la imagen del plano y encola de forma explícita la tarea en Celery.
+        Responde HTTP 202 Accepted de inmediato.
+      tags:
+      - plans
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SpatialPlanUpload'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SpatialPlanUpload'
+        required: true
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpatialPlanUpload'
+          description: ''
+  /api/route/:
+    get:
+      operationId: route_retrieve
+      description: |-
+        Endpoint REST para el cálculo de itinerarios interiores.
+
+        GET /api/route/?start_space_id=1&target_space_id=5&preference=accessible
+      tags:
+      - route
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/spaces/:
+    get:
+      operationId: spaces_list
+      tags:
+      - spaces
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpaceList'
+          description: ''
+    post:
+      operationId: spaces_create
+      tags:
+      - spaces
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Space'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Space'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Space'
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Space'
+          description: ''
+  /api/spaces/{id}/:
+    get:
+      operationId: spaces_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this space.
+        required: true
+      tags:
+      - spaces
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Space'
+          description: ''
+    put:
+      operationId: spaces_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this space.
+        required: true
+      tags:
+      - spaces
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Space'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Space'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Space'
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Space'
+          description: ''
+    patch:
+      operationId: spaces_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this space.
+        required: true
+      tags:
+      - spaces
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSpace'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSpace'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSpace'
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Space'
+          description: ''
+    delete:
+      operationId: spaces_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this space.
+        required: true
+      tags:
+      - spaces
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+components:
+  schemas:
+    AuthToken:
+      type: object
+      properties:
+        username:
+          type: string
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+        token:
+          type: string
+          readOnly: true
+      required:
+      - password
+      - token
+      - username
+    Building:
+      type: object
+      description: Serializa objetos Building al estándar GeoJSON.
+      properties:
+        type:
+          $ref: '#/components/schemas/GisFeatureEnum'
+        id:
+          type: integer
+          readOnly: true
+        geometry:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+              - Polygon
+            coordinates:
+              type: array
+              items:
+                type: array
+                items:
+                  type: array
+                  items:
+                    type: number
+                    format: float
+                  example:
+                  - 12.9721
+                  - 77.5933
+                  minItems: 2
+                  maxItems: 3
+                example:
+                - - 22.4707
+                  - 70.0577
+                - - 12.9721
+                  - 77.5933
+                minItems: 4
+              example:
+              - - - 0.0
+                  - 0.0
+                - - 0.0
+                  - 50.0
+                - - 50.0
+                  - 50.0
+                - - 50.0
+                  - 0.0
+                - - 0.0
+                  - 0.0
+        properties:
+          type: object
+          properties:
+            external_id:
+              type: string
+              nullable: true
+              description: ID del edificio en planos externos
+              maxLength: 100
+            name:
+              type: string
+              maxLength: 100
+            code:
+              type: string
+              description: 'Código identificador del edificio (ej: EPS-I)'
+              maxLength: 10
+            campus:
+              type: integer
+    BuildingList:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/GisFeatureCollectionEnum'
+        features:
+          type: array
+          items:
+            $ref: '#/components/schemas/Building'
+    Campus:
+      type: object
+      description: Serializa objetos Campus al estándar GeoJSON.
+      properties:
+        type:
+          $ref: '#/components/schemas/GisFeatureEnum'
+        id:
+          type: integer
+          readOnly: true
+        geometry:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+              - Polygon
+            coordinates:
+              type: array
+              items:
+                type: array
+                items:
+                  type: array
+                  items:
+                    type: number
+                    format: float
+                  example:
+                  - 12.9721
+                  - 77.5933
+                  minItems: 2
+                  maxItems: 3
+                example:
+                - - 22.4707
+                  - 70.0577
+                - - 12.9721
+                  - 77.5933
+                minItems: 4
+              example:
+              - - - 0.0
+                  - 0.0
+                - - 0.0
+                  - 50.0
+                - - 50.0
+                  - 50.0
+                - - 50.0
+                  - 0.0
+                - - 0.0
+                  - 0.0
+        properties:
+          type: object
+          properties:
+            external_id:
+              type: string
+              nullable: true
+              description: ID del campus en planos externos
+              maxLength: 100
+            name:
+              type: string
+              maxLength: 100
+            slug:
+              type: string
+              maxLength: 100
+              pattern: ^[-a-zA-Z0-9_]+$
+            created_at:
+              type: string
+              format: date-time
+              readOnly: true
+    CampusList:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/GisFeatureCollectionEnum'
+        features:
+          type: array
+          items:
+            $ref: '#/components/schemas/Campus'
+    Floor:
+      type: object
+      description: Serializa objetos Floor al estándar GeoJSON.
+      properties:
+        type:
+          $ref: '#/components/schemas/GisFeatureEnum'
+        id:
+          type: integer
+          readOnly: true
+        geometry:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+              - Polygon
+            coordinates:
+              type: array
+              items:
+                type: array
+                items:
+                  type: array
+                  items:
+                    type: number
+                    format: float
+                  example:
+                  - 12.9721
+                  - 77.5933
+                  minItems: 2
+                  maxItems: 3
+                example:
+                - - 22.4707
+                  - 70.0577
+                - - 12.9721
+                  - 77.5933
+                minItems: 4
+              example:
+              - - - 0.0
+                  - 0.0
+                - - 0.0
+                  - 50.0
+                - - 50.0
+                  - 50.0
+                - - 50.0
+                  - 0.0
+                - - 0.0
+                  - 0.0
+        properties:
+          type: object
+          properties:
+            external_id:
+              type: string
+              nullable: true
+              description: ID de la planta en planos externos
+              maxLength: 100
+            level:
+              type: integer
+              maximum: 2147483647
+              minimum: -2147483648
+              description: Número de planta (0=Baja, 1=Primera, -1=Sótano)
+            name:
+              type: string
+              description: 'Nombre de la planta (ej: Planta Primera)'
+              maxLength: 50
+            altitude:
+              type: number
+              format: double
+              description: Altitud relativa en metros desde el suelo
+            building:
+              type: integer
+    FloorList:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/GisFeatureCollectionEnum'
+        features:
+          type: array
+          items:
+            $ref: '#/components/schemas/Floor'
+    GisFeatureCollectionEnum:
+      type: string
+      enum:
+      - FeatureCollection
+    GisFeatureEnum:
+      type: string
+      enum:
+      - Feature
+    NavigationEdge:
+      type: object
+      description: Serializa las conexiones del grafo al estándar GeoJSON.
+      properties:
+        type:
+          $ref: '#/components/schemas/GisFeatureEnum'
+        id:
+          type: integer
+          readOnly: true
+        geometry:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+              - LineString
+            coordinates:
+              type: array
+              items:
+                type: array
+                items:
+                  type: number
+                  format: float
+                example:
+                - 12.9721
+                - 77.5933
+                minItems: 2
+                maxItems: 3
+              example:
+              - - 22.4707
+                - 70.0577
+              - - 12.9721
+                - 77.5933
+              minItems: 2
+        properties:
+          type: object
+          properties:
+            name:
+              type: string
+              description: 'Nombre opcional de la conexión (ej: Pasillo-Aula101)'
+              maxLength: 100
+            source_space:
+              type: integer
+              description: Espacio de origen (Nodo A)
+            target_space:
+              type: integer
+              description: Espacio de destino (Nodo B)
+            is_accessible:
+              type: boolean
+              description: Indica si este tramo es apto para personas con movilidad
+                reducida (sin escaleras)
+    NavigationEdgeList:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/GisFeatureCollectionEnum'
+        features:
+          type: array
+          items:
+            $ref: '#/components/schemas/NavigationEdge'
+    PatchedBuilding:
+      type: object
+      description: Serializa objetos Building al estándar GeoJSON.
+      properties:
+        type:
+          $ref: '#/components/schemas/GisFeatureEnum'
+        id:
+          type: integer
+          readOnly: true
+        geometry:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+              - Polygon
+            coordinates:
+              type: array
+              items:
+                type: array
+                items:
+                  type: array
+                  items:
+                    type: number
+                    format: float
+                  example:
+                  - 12.9721
+                  - 77.5933
+                  minItems: 2
+                  maxItems: 3
+                example:
+                - - 22.4707
+                  - 70.0577
+                - - 12.9721
+                  - 77.5933
+                minItems: 4
+              example:
+              - - - 0.0
+                  - 0.0
+                - - 0.0
+                  - 50.0
+                - - 50.0
+                  - 50.0
+                - - 50.0
+                  - 0.0
+                - - 0.0
+                  - 0.0
+        properties:
+          type: object
+          properties:
+            external_id:
+              type: string
+              nullable: true
+              description: ID del edificio en planos externos
+              maxLength: 100
+            name:
+              type: string
+              maxLength: 100
+            code:
+              type: string
+              description: 'Código identificador del edificio (ej: EPS-I)'
+              maxLength: 10
+            campus:
+              type: integer
+    PatchedCampus:
+      type: object
+      description: Serializa objetos Campus al estándar GeoJSON.
+      properties:
+        type:
+          $ref: '#/components/schemas/GisFeatureEnum'
+        id:
+          type: integer
+          readOnly: true
+        geometry:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+              - Polygon
+            coordinates:
+              type: array
+              items:
+                type: array
+                items:
+                  type: array
+                  items:
+                    type: number
+                    format: float
+                  example:
+                  - 12.9721
+                  - 77.5933
+                  minItems: 2
+                  maxItems: 3
+                example:
+                - - 22.4707
+                  - 70.0577
+                - - 12.9721
+                  - 77.5933
+                minItems: 4
+              example:
+              - - - 0.0
+                  - 0.0
+                - - 0.0
+                  - 50.0
+                - - 50.0
+                  - 50.0
+                - - 50.0
+                  - 0.0
+                - - 0.0
+                  - 0.0
+        properties:
+          type: object
+          properties:
+            external_id:
+              type: string
+              nullable: true
+              description: ID del campus en planos externos
+              maxLength: 100
+            name:
+              type: string
+              maxLength: 100
+            slug:
+              type: string
+              maxLength: 100
+              pattern: ^[-a-zA-Z0-9_]+$
+            created_at:
+              type: string
+              format: date-time
+              readOnly: true
+    PatchedFloor:
+      type: object
+      description: Serializa objetos Floor al estándar GeoJSON.
+      properties:
+        type:
+          $ref: '#/components/schemas/GisFeatureEnum'
+        id:
+          type: integer
+          readOnly: true
+        geometry:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+              - Polygon
+            coordinates:
+              type: array
+              items:
+                type: array
+                items:
+                  type: array
+                  items:
+                    type: number
+                    format: float
+                  example:
+                  - 12.9721
+                  - 77.5933
+                  minItems: 2
+                  maxItems: 3
+                example:
+                - - 22.4707
+                  - 70.0577
+                - - 12.9721
+                  - 77.5933
+                minItems: 4
+              example:
+              - - - 0.0
+                  - 0.0
+                - - 0.0
+                  - 50.0
+                - - 50.0
+                  - 50.0
+                - - 50.0
+                  - 0.0
+                - - 0.0
+                  - 0.0
+        properties:
+          type: object
+          properties:
+            external_id:
+              type: string
+              nullable: true
+              description: ID de la planta en planos externos
+              maxLength: 100
+            level:
+              type: integer
+              maximum: 2147483647
+              minimum: -2147483648
+              description: Número de planta (0=Baja, 1=Primera, -1=Sótano)
+            name:
+              type: string
+              description: 'Nombre de la planta (ej: Planta Primera)'
+              maxLength: 50
+            altitude:
+              type: number
+              format: double
+              description: Altitud relativa en metros desde el suelo
+            building:
+              type: integer
+    PatchedNavigationEdge:
+      type: object
+      description: Serializa las conexiones del grafo al estándar GeoJSON.
+      properties:
+        type:
+          $ref: '#/components/schemas/GisFeatureEnum'
+        id:
+          type: integer
+          readOnly: true
+        geometry:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+              - LineString
+            coordinates:
+              type: array
+              items:
+                type: array
+                items:
+                  type: number
+                  format: float
+                example:
+                - 12.9721
+                - 77.5933
+                minItems: 2
+                maxItems: 3
+              example:
+              - - 22.4707
+                - 70.0577
+              - - 12.9721
+                - 77.5933
+              minItems: 2
+        properties:
+          type: object
+          properties:
+            name:
+              type: string
+              description: 'Nombre opcional de la conexión (ej: Pasillo-Aula101)'
+              maxLength: 100
+            source_space:
+              type: integer
+              description: Espacio de origen (Nodo A)
+            target_space:
+              type: integer
+              description: Espacio de destino (Nodo B)
+            is_accessible:
+              type: boolean
+              description: Indica si este tramo es apto para personas con movilidad
+                reducida (sin escaleras)
+    PatchedSpace:
+      type: object
+      description: Serializa las celdas IndoorGML al estándar GeoJSON.
+      properties:
+        type:
+          $ref: '#/components/schemas/GisFeatureEnum'
+        id:
+          type: integer
+          readOnly: true
+        geometry:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+              - Polygon
+            coordinates:
+              type: array
+              items:
+                type: array
+                items:
+                  type: array
+                  items:
+                    type: number
+                    format: float
+                  example:
+                  - 12.9721
+                  - 77.5933
+                  minItems: 2
+                  maxItems: 3
+                example:
+                - - 22.4707
+                  - 70.0577
+                - - 12.9721
+                  - 77.5933
+                minItems: 4
+              example:
+              - - - 0.0
+                  - 0.0
+                - - 0.0
+                  - 50.0
+                - - 50.0
+                  - 50.0
+                - - 50.0
+                  - 0.0
+                - - 0.0
+                  - 0.0
+        properties:
+          type: object
+          properties:
+            external_id:
+              type: string
+              nullable: true
+              description: ID del espacio en planos externos
+              maxLength: 100
+            name:
+              type: string
+              description: 'Ej: Aula 1.1, Despacho 202'
+              maxLength: 100
+            space_type:
+              enum:
+              - ROOM
+              - CORRIDOR
+              - STAIRS
+              - ELEVATOR
+              - RESTROOM
+              - RESTRICTED
+              type: string
+              description: |-
+                * `ROOM` - Aula / Despacho
+                * `CORRIDOR` - Pasillo / Zona de Circulación
+                * `STAIRS` - Escaleras
+                * `ELEVATOR` - Ascensor
+                * `RESTROOM` - Servicios / Aseos
+                * `RESTRICTED` - Zona Restringida / Técnica
+            floor:
+              type: integer
+    Space:
+      type: object
+      description: Serializa las celdas IndoorGML al estándar GeoJSON.
+      properties:
+        type:
+          $ref: '#/components/schemas/GisFeatureEnum'
+        id:
+          type: integer
+          readOnly: true
+        geometry:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+              - Polygon
+            coordinates:
+              type: array
+              items:
+                type: array
+                items:
+                  type: array
+                  items:
+                    type: number
+                    format: float
+                  example:
+                  - 12.9721
+                  - 77.5933
+                  minItems: 2
+                  maxItems: 3
+                example:
+                - - 22.4707
+                  - 70.0577
+                - - 12.9721
+                  - 77.5933
+                minItems: 4
+              example:
+              - - - 0.0
+                  - 0.0
+                - - 0.0
+                  - 50.0
+                - - 50.0
+                  - 50.0
+                - - 50.0
+                  - 0.0
+                - - 0.0
+                  - 0.0
+        properties:
+          type: object
+          properties:
+            external_id:
+              type: string
+              nullable: true
+              description: ID del espacio en planos externos
+              maxLength: 100
+            name:
+              type: string
+              description: 'Ej: Aula 1.1, Despacho 202'
+              maxLength: 100
+            space_type:
+              enum:
+              - ROOM
+              - CORRIDOR
+              - STAIRS
+              - ELEVATOR
+              - RESTROOM
+              - RESTRICTED
+              type: string
+              description: |-
+                * `ROOM` - Aula / Despacho
+                * `CORRIDOR` - Pasillo / Zona de Circulación
+                * `STAIRS` - Escaleras
+                * `ELEVATOR` - Ascensor
+                * `RESTROOM` - Servicios / Aseos
+                * `RESTRICTED` - Zona Restringida / Técnica
+            floor:
+              type: integer
+    SpaceList:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/GisFeatureCollectionEnum'
+        features:
+          type: array
+          items:
+            $ref: '#/components/schemas/Space'
+    SpatialPlanList:
+      type: object
+      description: Serializador resumido para listar todos los planos registrados.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        file_hash:
+          type: string
+          description: Hash SHA-256 del archivo
+          maxLength: 64
+        error_log:
+          type: string
+          nullable: true
+          description: Traza detallada del error si el estado es FAILED
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - file_hash
+      - id
+      - updated_at
+    SpatialPlanStatus:
+      type: object
+      description: Serializador de lectura para el polling de estado y resultados.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        image:
+          type: string
+          format: uri
+          description: Archivo de imagen del plano (PNG/JPG/SVG)
+        file_hash:
+          type: string
+          description: Hash SHA-256 del archivo
+          maxLength: 64
+        intermediate_proposal:
+          nullable: true
+          description: Esquema JSON normalizado de la propuesta
+        ai_metadata:
+          description: 'Métricas de ejecución: {prompt, tokens_used, cost_usd, provider_name}'
+        error_log:
+          type: string
+          nullable: true
+          description: Traza detallada del error si el estado es FAILED
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - file_hash
+      - id
+      - image
+      - updated_at
+    SpatialPlanUpload:
+      type: object
+      description: Serializador para la carga inicial de un plano espacial.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        image:
+          type: string
+          format: uri
+          description: Archivo de imagen del plano (PNG/JPG/SVG)
+        model_type:
+          type: string
+          writeOnly: true
+          description: 'Nombre del modelo objetivo (ej: ''campus'', ''building'',
+            ''floor'')'
+        target_id:
+          type: integer
+          writeOnly: true
+          description: ID del objeto objetivo
+        ai_provider:
+          type: string
+          writeOnly: true
+          default: mock
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - image
+      - model_type
+      - target_id
+    StatusEnum:
+      enum:
+      - UPLOADED
+      - PREPROCESSING
+      - EXTRACTING
+      - REQUIRES_REVIEW
+      - PROCESSED
+      - APPROVED
+      - REJECTED
+      - FAILED
+      type: string
+      description: |-
+        * `UPLOADED` - Cargado / Pendiente
+        * `PREPROCESSING` - Preprocesando Imagen
+        * `EXTRACTING` - Extrayendo con IA
+        * `REQUIRES_REVIEW` - Requiere Revisión Manual
+        * `PROCESSED` - Procesado Completamente
+        * `APPROVED` - Aprobado y Persistido
+        * `REJECTED` - Rechazado por el Revisor
+        * `FAILED` - Error en el Pipeline
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
+    tokenAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Token-based authentication with required prefix "Token"
