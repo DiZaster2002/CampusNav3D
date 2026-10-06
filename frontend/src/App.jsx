@@ -1,57 +1,50 @@
-import { useEffect, useState } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { initApiConfig } from './config';
+import { ProtectedRoute } from './ProtectedRoute';
+import { Login } from './Login';
+import { Admin } from './Admin';
+import { useEffect, useState } from 'react';
 import { CampusesService } from './api';
 
 // Inicializar la configuración global de la API
 initApiConfig();
 
-function App() {
+// Componente para la Vista Pública Principal
+// (Pública para Alumnos y Visitantes)
+function Home() {
   const [campuses, setCampuses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     CampusesService.campusesList()
       .then((response) => {
-        console.log('GeoJSON recibido:', response);
-
-        let list = [];
-
-        if (Array.isArray(response)) {
-          list = response;
-        } else if (response && Array.isArray(response.features)) {
-          // GeoJSON FeatureCollection
-          list = response.features;
-        } else if (response && Array.isArray(response.results)) {
-          list = response.results;
-        }
+        const list = Array.isArray(response)
+          ? response
+          : (
+              response?.features ||
+              response?.results ||
+              []
+            );
 
         setCampuses(list);
         setLoading(false);
       })
-      .catch((err) => {
+      .catch((error) => {
         console.error(
-          'Error al conectar con Django en Docker:',
-          err
+          'Error al cargar los campus:',
+          error
         );
-        setError('No se pudo conectar con el servidor backend.');
         setLoading(false);
       });
   }, []);
 
   return (
     <div>
-      <h1>CampusNav3D - Cliente API y Frontend</h1>
+      <h1>CampusNav3D - Vista Pública</h1>
 
-      {loading && (
-        <p>Cargando datos desde Django (Docker)...</p>
-      )}
-
-      {error && (
-        <p role="alert">{error}</p>
-      )}
-
-      {!loading && !error && (
+      {loading ? (
+        <p>Cargando datos del mapa...</p>
+      ) : (
         <section>
           <h2>Lista de Campus Disponibles:</h2>
 
@@ -62,9 +55,8 @@ function App() {
           ) : (
             <ul>
               {campuses.map((campus, index) => {
-                // Si es un Feature GeoJSON, los datos suelen estar
-                // dentro de "properties".
-                const props = campus?.properties || campus;
+                const props =
+                  campus?.properties || campus;
 
                 const id =
                   campus?.id ??
@@ -95,4 +87,33 @@ function App() {
   );
 }
 
-export default App;
+// Configuración Global de Rutas
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+
+        {/* Ruta Pública Principal (Alumnos / Visitantes) */}
+        <Route
+          path="/"
+          element={<Home />}
+        />
+
+        {/* Ruta Pública de Login */}
+        <Route
+          path="/login"
+          element={<Login />}
+        />
+
+        {/* Rutas Protegidas (Solo accesibles con Token) */}
+        <Route element={<ProtectedRoute />}>
+          <Route
+            path="/admin"
+            element={<Admin />}
+          />
+        </Route>
+
+      </Routes>
+    </BrowserRouter>
+  );
+}

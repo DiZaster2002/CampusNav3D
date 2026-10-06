@@ -1,8 +1,5 @@
 import { OpenAPI } from './api';
-
-export const getAuthToken = () => localStorage.getItem('auth_token');
-export const setAuthToken = (token) => localStorage.setItem('auth_token', token);
-export const removeAuthToken = () => localStorage.removeItem('auth_token');
+import { getToken } from './auth';
 
 export const initApiConfig = () => {
   // Dirección del backend Django en Docker
@@ -10,6 +7,7 @@ export const initApiConfig = () => {
 
   // Inyección del token para peticiones autenticadas
   OpenAPI.TOKEN = async () => {
-    return getAuthToken() || '';
+    const token = getToken();
+    return token ? token : '';
   };
 };
