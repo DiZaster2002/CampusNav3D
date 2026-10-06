@@ -8,6 +8,6 @@ drf-spectacular>=0.30.0
 Pillow>=12.3.0
 networkx>=3.6.1
 celery>=5.6.3
-pydantic>=2.13.4
+pydantic>=2.13.5
 redis>=8.1.0
 setuptools>=84.0.0,<85.0.0
