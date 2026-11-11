@@ -632,6 +632,28 @@ paths:
                 items:
                   $ref: '#/components/schemas/SpatialPlanList'
           description: ''
+  /api/plans/{id}/:
+    get:
+      operationId: plans_retrieve
+      description: GET /api/plans/{id}/ devuelve el resumen de un plano.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - plans
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpatialPlanList'
+          description: ''
   /api/plans/{id}/approve/:
     post:
       operationId: plans_approve_create
