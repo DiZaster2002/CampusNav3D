@@ -446,6 +446,21 @@ class SpatialPlanQueryTests(AuthenticatedAPITestCase):
         self.assertIn('file_hash', first_item)
         self.assertIn('created_at', first_item)
 
+    def test_get_spatial_plan_by_id(self):
+        url = reverse('spatialplan-detail', kwargs={'pk': self.plan_requires_review.id})
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['id'], self.plan_requires_review.id)
+        self.assertEqual(response.data['status'], SpatialPlanStatus.REQUIRES_REVIEW)
+        self.assertEqual(response.data['file_hash'], 'hash_query_test_1')
+
+    def test_get_spatial_plan_by_id_not_found(self):
+        url = reverse('spatialplan-detail', kwargs={'pk': 99999})
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
 class SpatialPlanApproveTests(AuthenticatedAPITestCase):
     """Pruebas de integración para la aprobación de planos y persistencia GIS (POST /api/plans/<id>/approve/)."""
 

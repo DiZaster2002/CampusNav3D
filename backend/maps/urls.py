@@ -12,6 +12,7 @@ from .views import (
     SpatialPlanApproveView,
     SpatialPlanRejectView,
     SpatialPlanListView,
+    SpatialPlanRetrieveView,
     RouteAPIView
 )
 
@@ -26,6 +27,7 @@ urlpatterns = [
     path('', include(router.urls)),
     path('login/', obtain_auth_token, name='api-token-auth'),
     path('plans/', SpatialPlanListView.as_view(), name='spatialplan-list'),
+    path('plans/<int:pk>/', SpatialPlanRetrieveView.as_view(), name='spatialplan-detail'),
     path('plans/upload/', SpatialPlanUploadView.as_view(), name='plan-upload'),
     path('plans/<int:pk>/status/', SpatialPlanStatusView.as_view(), name='plan-status'),
     path('plans/<int:pk>/approve/', SpatialPlanApproveView.as_view(), name='plan-approve'), 

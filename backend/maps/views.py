@@ -62,7 +62,7 @@ class SpatialPlanUploadView(generics.CreateAPIView):
     queryset = SpatialPlan.objects.all()
     serializer_class = SpatialPlanUploadSerializer
     parser_classes = (MultiPartParser, FormParser)
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -141,6 +141,13 @@ class SpatialPlanListView(generics.ListAPIView):
     Devuelve la lista completa de planos registrados y sus estados actuales.
     """
     queryset = SpatialPlan.objects.all().order_by('-created_at')
+    serializer_class = SpatialPlanListSerializer
+    permission_classes = [IsAuthenticated]
+
+
+class SpatialPlanRetrieveView(generics.RetrieveAPIView):
+    """GET /api/plans/<id>/ devuelve el resumen de un plano."""
+    queryset = SpatialPlan.objects.all()
     serializer_class = SpatialPlanListSerializer
     permission_classes = [IsAuthenticated]
 

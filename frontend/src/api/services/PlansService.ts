@@ -22,6 +22,24 @@ export class PlansService {
         });
     }
     /**
+     * GET /api/plans/{id}/
+     * Devuelve el resumen de un plano registrado.
+     * @param id
+     * @returns SpatialPlanList
+     * @throws ApiError
+     */
+    public static plansRetrieve(
+        id: number,
+    ): CancelablePromise<SpatialPlanList> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/plans/{id}/',
+            path: {
+                'id': id,
+            },
+        });
+    }
+    /**
      * POST /api/plans//approve/
      * Convierte el draft_data (o la versión editada) en objetos GIS reales (Space)
      * y marca el plano como APPROVED.
