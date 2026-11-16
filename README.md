@@ -209,9 +209,17 @@ The frontend expects the backend at `http://localhost:8000` (set in `frontend/sr
 Authentication uses tokens. Obtain one with your account and send it in the `Authorization` header.
 
 ```bash
-curl -X POST http://localhost:8000/api/login/ \
-  -d "username=<user>&password=<password>"
-# {"token": "<token>"}
+$body = @{
+    username = "TU_USUARIO"
+    password = "TU_CONTRASEÑA"
+}
+
+$respuesta = Invoke-RestMethod `
+    -Method Post `
+    -Uri "http://localhost:8000/api/login/" `
+    -Body $body
+
+$respuesta.token
 ```
 
 | Method and path | Description | Access |
@@ -223,6 +231,12 @@ curl -X POST http://localhost:8000/api/login/ \
 | `GET /api/plans/<id>/status/` | Poll the state, proposal and AI metadata of a plan | Authenticated |
 | `POST /api/plans/<id>/approve/` | Approve a plan in `REQUIRES_REVIEW` and create its spaces | Authenticated |
 | `POST /api/plans/<id>/reject/` | Reject a plan in `REQUIRES_REVIEW` | Authenticated |
+
+An example of authenticated route use:
+
+```bash
+curl.exe -X GET "http://localhost:8000/api/plans/" -H "Authorization: Token <token_here>"
+```
 
 Compute a route (`preference` is `fastest` or `accessible`; `building_id` and `floor_id` are optional filters):
 
@@ -240,9 +254,10 @@ curl -X POST http://localhost:8000/api/plans/upload/ \
   -F "image=@test_img/test2.png" \
   -F "model_type=floor" \
   -F "target_id=1" \
-  -F "ai_provider=mock"
-
-curl -H "Authorization: Token <token>" http://localhost:8000/api/plans/1/status/
+  -F "ai_provider=mock" \ 
+  -H "Authorization: Token <token_here>" 
+  
+curl -X GET http://localhost:8000/api/plans/1/status/
 ```
 
 Requests are throttled to 100 per day for anonymous users and 1000 per day for authenticated users.
