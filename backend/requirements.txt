@@ -10,4 +10,4 @@ networkx>=3.6.1
 celery>=5.7.0
 pydantic>=2.14.1
 redis>=8.1.0
-setuptools>=84.0.0,<85.0.0
+setuptools>=84.2.1,<85.0.0
